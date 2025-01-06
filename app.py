@@ -223,5 +223,5 @@ def exportar_excel():
         as_attachment=True,
         download_name="Listado_Activos.xlsx")
 if __name__ == "__main__":
-    app.run(host="192.168.80.123", port=8000, debug=True)
+    app.run(host="0.0.0.0", port=8000, debug=True)
     
