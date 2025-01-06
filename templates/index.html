@@ -1,0 +1,244 @@
+index.html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de Activos</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #444;
+            margin-bottom: 5px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+
+        h1 img {
+            height: 60px; /* Ajusta el tamaño del logo */
+            vertical-align: middle;
+        }
+
+        h2 {
+            text-align: center;
+            color: #555;
+            margin-top: 0;
+            font-size: 18px;
+        }
+
+        .search-filter {
+            max-width: 800px;
+            margin: 20px auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .search-filter input, .search-filter select, .search-filter button {
+            padding: 10px;
+            font-size: 14px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .search-filter button {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        .search-filter button:hover {
+            background-color: #0056b3;
+        }
+
+        .table-container {
+            max-width: 1000px;
+            margin: 20px auto;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        table thead {
+            background-color: #007BFF;
+            color: white;
+        }
+
+        table th, table td {
+            padding: 12px;
+            text-align: left;
+            border: 1px solid #ddd;
+        }
+
+        table th {
+            font-weight: bold;
+        }
+
+        table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        table tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        .actions {
+            display: flex;
+            gap: 5px;
+            justify-content: center;
+        }
+
+        .actions a {
+            text-decoration: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: bold;
+            color: white;
+        }
+
+        .actions .view {
+            background-color: #17a2b8;
+        }
+
+        .actions .view:hover {
+            background-color: #138496;
+        }
+
+        .actions .edit {
+            background-color: #ffc107;
+        }
+
+        .actions .edit:hover {
+            background-color: #e0a800;
+        }
+
+        .actions .delete {
+            background-color: #dc3545;
+        }
+
+        .actions .delete:hover {
+            background-color: #c82333;
+        }
+
+        .new-asset {
+            display: block;
+            text-align: center;
+            margin: 20px auto;
+            background-color: #28a745;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 4px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .new-asset:hover {
+            background-color: #218838;
+        }
+
+        .export-link {
+            display: block;
+            text-align: center;
+            margin: 10px auto;
+            background-color: #16c258;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 4px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .export-link:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <h1>
+        <img src="{{ url_for('static', filename='images/logoalamo.png') }}" alt="Logo de la Empresa">
+        Alamo Terminales Marítimos
+    </h1>
+    <h2>Lista de Activos</h2>
+
+    <!-- Barra de búsqueda y filtros -->
+    <div class="search-filter">
+        <form method="GET" action="/" style="display: flex; flex: 1; gap: 10px;">
+            <input type="text" name="search" placeholder="Buscar por nombre, ubicación, predio..." value="{{ search_query }}">
+            <select name="estado">
+                <option value="">-- Filtrar por estado --</option>
+                {% for estado in estados %}
+                <option value="{{ estado }}" {% if filter_estado == estado %}selected{% endif %}>{{ estado }}</option>
+                {% endfor %}
+            </select>
+            <button type="submit">Buscar</button>
+        </form>
+    </div>
+
+    <!-- Enlace para exportar a Excel -->
+    <a href="/exportar_excel" class="export-link">Exportar a Excel</a>
+
+    <!-- Tabla de activos -->
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Número de Activo</th>
+                    <th>Nombre</th>
+                    <th>Ubicación</th>
+                    <th>Estado</th>
+                    <th>Predio</th>
+                    <th>Marca</th>
+                    <th>Serie</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for activo in activos %}
+                <tr>
+                    <td>{{ activo[1] }}</td>
+                    <td>{{ activo[2] }}</td>
+                    <td>{{ activo[3] }}</td>
+                    <td>{{ activo[4] }}</td>
+                    <td>{{ activo[7] }}</td>
+                    <td>{{ activo[8] }}</td>
+                    <td>{{ activo[9] }}</td>
+                    <td class="actions">
+                        <a href="/activo/{{ activo[0] }}" class="view">Ver</a>
+                        <a href="/editar/{{ activo[0] }}" class="edit">Editar</a>
+                        <a href="/eliminar/{{ activo[0] }}" class="delete">Eliminar</a>
+                    </td>
+                </tr>
+                {% endfor %}
+                {% if not activos %}
+                <tr>
+                    <td colspan="8" style="text-align: center;">No se encontraron activos con los criterios seleccionados.</td>
+                </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Enlace para registrar un nuevo activo -->
+    <a href="/registrar" class="new-asset">Registrar Nuevo Activo</a>
+</body>
+</html>

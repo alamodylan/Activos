@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registrar Activo</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        form {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+            width: 100%;
+        }
+
+        label {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        input[type="text"], input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        button {
+            width: 100%;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .error {
+            color: red;
+            font-size: 14px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <form method="POST">
+        <h1>Registrar Nuevo Activo</h1>
+
+        <!-- Mostrar mensaje de error si el código de autorización es incorrecto -->
+        {% if error %}
+        <div class="error">{{ error }}</div>
+        {% endif %}
+        
+        <!-- Código del activo -->
+        <label for="codigo">Código:</label>
+        <input type="text" id="codigo" name="codigo" required>
+        
+        <!-- Nombre del activo -->
+        <label for="nombre">Nombre:</label>
+        <input type="text" id="nombre" name="nombre" required>
+        
+        <!-- Ubicación del activo -->
+        <label for="ubicacion">Ubicación:</label>
+        <input type="text" id="ubicacion" name="ubicacion" required>
+        
+        <!-- Estado del activo -->
+        <label for="estado">Estado:</label>
+        <input type="text" id="estado" name="estado" required>
+        
+        <!-- Responsable del activo -->
+        <label for="responsable">Responsable:</label>
+        <input type="text" id="responsable" name="responsable">
+        
+        <!-- Predio del activo -->
+        <label for="predio">Predio:</label>
+        <input type="text" id="predio" name="predio" required>
+        
+        <!-- Marca del activo -->
+        <label for="marca">Marca:</label>
+        <input type="text" id="marca" name="marca" required>
+        
+        <!-- Serie del activo -->
+        <label for="serie">Serie:</label>
+        <input type="text" id="serie" name="serie" required>
+        
+        <!-- Código de autorización -->
+        <label for="codigo_autorizacion">Código de Autorización:</label>
+        <input type="password" id="codigo_autorizacion" name="codigo_autorizacion" required>
+        
+        <!-- Botón para registrar -->
+        <button type="submit">Registrar</button>
+    </form>
+</body>
+</html>

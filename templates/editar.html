@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Activo</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        form {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+            width: 100%;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #444;
+        }
+
+        label {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        input[type="text"], input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        button {
+            width: 100%;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .cancel {
+            display: block;
+            text-align: center;
+            margin-top: 15px;
+            background-color: #6c757d;
+            color: white;
+            padding: 10px;
+            border-radius: 4px;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .cancel:hover {
+            background-color: #5a6268;
+        }
+
+        .error {
+            color: red;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <form method="POST">
+        <h1>Editar Activo</h1>
+        
+        <!-- Mostrar error si existe -->
+        {% if error %}
+        <p class="error">{{ error }}</p>
+        {% endif %}
+        
+        <!-- Campo para el código -->
+        <label for="codigo">Código:</label>
+        <input type="text" id="codigo" name="codigo" value="{{ activo[1] }}" required>
+        
+        <!-- Campo para el nombre -->
+        <label for="nombre">Nombre:</label>
+        <input type="text" id="nombre" name="nombre" value="{{ activo[2] }}" required>
+        
+        <!-- Campo para la ubicación -->
+        <label for="ubicacion">Ubicación:</label>
+        <input type="text" id="ubicacion" name="ubicacion" value="{{ activo[3] }}" required>
+        
+        <!-- Campo para el estado -->
+        <label for="estado">Estado:</label>
+        <input type="text" id="estado" name="estado" value="{{ activo[4] }}" required>
+        
+        <!-- Campo para el responsable -->
+        <label for="responsable">Responsable:</label>
+        <input type="text" id="responsable" name="responsable" value="{{ activo[5] }}">
+        
+        <!-- Campo para el predio -->
+        <label for="predio">Predio:</label>
+        <input type="text" id="predio" name="predio" value="{{ activo[7] }}" required>
+        
+        <!-- Campo para la marca -->
+        <label for="marca">Marca:</label>
+        <input type="text" id="marca" name="marca" value="{{ activo[8] }}" required>
+        
+        <!-- Campo para la serie -->
+        <label for="serie">Serie:</label>
+        <input type="text" id="serie" name="serie" value="{{ activo[9] }}" required>
+        
+        <!-- Campo para el código de autorización -->
+        <label for="codigo_autorizacion">Código de Autorización:</label>
+        <input type="password" id="codigo_autorizacion" name="codigo_autorizacion" required>
+        
+        <!-- Botón para guardar -->
+        <button type="submit">Guardar Cambios</button>
+        
+        <!-- Enlace para cancelar -->
+        <a href="/" class="cancel">Cancelar</a>
+    </form>
+</body>
+</html>
