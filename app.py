@@ -117,7 +117,7 @@ def registrar():
         cursor = conn.cursor()
         cursor.execute("""
         INSERT INTO activos (codigo, nombre, ubicacion, estado, responsable, predio, marca, serie, fecha_actualizacion)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
         """, (codigo, nombre, ubicacion, estado, responsable, predio, marca, serie, fecha))
         conn.commit()
         conn.close()
