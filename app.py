@@ -5,17 +5,49 @@ from datetime import datetime
 import qrcode
 import pandas as pd
 from io import BytesIO
+import psycopg2
+from psycopg2.extras import RealDictCursor
+import os
 
 app = Flask(__name__)
 
 # Ruta de la base de datos
-DATABASE = "database/activos.db"
+DATABASE_URL = "postgres://SlwK1sFIPJal7m8KaDtlRlYu1NseKxnV:SlwK1sFIPJal7m8KaDtlRlYu1NseKxnV@dpg-ctdis2jv2p9s73ai7op0-a:5432/citasatm_user"
 AUTHORIZED_CODE = "atm2406"  # Código de autorización para modificar y eliminar
 
 # Conexión a la base de datos
 def conectar_db():
-    conn = sqlite3.connect(DATABASE)
+    conn = psycopg2.connect("postgres://SlwK1sFIPJal7m8KaDtlRlYu1NseKxnV:SlwK1sFIPJal7m8KaDtlRlYu1NseKxnV@dpg-ctdis2jv2p9s73ai7op0-a:5432/citasatm_user")
     return conn
+def crear_tablas():
+    conn = conectar_db()  # Usa tu función conectar_db existente
+    cursor = conn.cursor()
+
+    # Comando SQL para crear la tabla `activos`
+    sql = """
+    CREATE TABLE IF NOT EXISTS activos (
+        id SERIAL PRIMARY KEY,                 -- ID único y autoincremental
+        codigo VARCHAR(50) NOT NULL,           -- Código del activo
+        nombre VARCHAR(100) NOT NULL,          -- Nombre del activo
+        ubicacion VARCHAR(100) NOT NULL,       -- Ubicación del activo
+        estado VARCHAR(50) NOT NULL,           -- Estado (e.g., Activo/Inactivo)
+        responsable VARCHAR(100),              -- Responsable del activo
+        fecha_actualizacion TIMESTAMP DEFAULT NOW(), -- Fecha de actualización
+        predio VARCHAR(50),                    -- Predio donde se encuentra el activo
+        marca VARCHAR(50),                     -- Marca del activo
+        serie VARCHAR(50)                      -- Serie del activo
+    );
+    """
+
+    try:
+        cursor.execute(sql)  # Ejecuta el comando SQL
+        conn.commit()        # Guarda los cambios
+        print("Tabla 'activos' creada exitosamente.")
+    except Exception as e:
+        print(f"Error al crear la tabla: {e}")
+    finally:
+        cursor.close()
+        conn.close()
 
 # Página principal con búsqueda y filtrado
 @app.route("/", methods=["GET", "POST"])
@@ -178,7 +210,7 @@ def generar_codigo_qr(codigo, nombre):
         os.makedirs(qr_folder)
 
     # Contenido del código QR: enlace a la página del activo
-    url_base = "http://192.168.80.123:8000"  # Cambiado para red local
+    url_base = "https://activos.onrender.com"  # Cambiado para red local
     contenido = f"{url_base}/activo/{codigo}"
 
     # Generar QR
@@ -199,29 +231,27 @@ def generar_codigo_qr(codigo, nombre):
 
 @app.route("/exportar_excel")
 def exportar_excel():
-    # Conectarse a la base de datos y obtener los datos
     conn = conectar_db()
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM activos")
     data = cursor.fetchall()
     conn.close()
 
-    # Crear un DataFrame con pandas
     columnas = ["ID", "Código", "Nombre", "Ubicación", "Estado", "Responsable", "Fecha Actualización", "Predio", "Marca", "Serie"]
     df = pd.DataFrame(data, columns=columnas)
 
-    # Crear el archivo Excel en memoria
     output = BytesIO()
     with pd.ExcelWriter(output, engine="openpyxl") as writer:
         df.to_excel(writer, index=False, sheet_name="Activos")
 
-    # Preparar el archivo para descarga
     output.seek(0)
     return send_file(
         output,
         mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
         as_attachment=True,
-        download_name="Listado_Activos.xlsx")
+        download_name="Listado_Activos.xlsx"
+    )
 if __name__ == "__main__":
+    crear_tablas()
     app.run(host="0.0.0.0", port=8000, debug=True)
     
