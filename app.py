@@ -12,25 +12,23 @@ import os
 app = Flask(__name__)
 
 # Ruta de la base de datos
-DATABASE_URL = "postgres://SlwK1sFIPJal7m8KaDtlRlYu1NseKxnV:SlwK1sFIPJal7m8KaDtlRlYu1NseKxnV@dpg-ctdis2jv2p9s73ai7op0-a:5432/citasatm_user"
+DATABASE_URL = "postgresql://SlwK1sFIPJal7m8KaDtlRlYu1NseKxnV:SlwK1sFIPJal7m8KaDtlRlYu1NseKxnV@dpg-ctdis2jv2p9s73ai7op0-a:5432/citasatm_user"
 AUTHORIZED_CODE = "atm2406"  # Código de autorización para modificar y eliminar
 
 # Conexión a la base de datos
-def conectar_db():
+def get_db_connection():
+    DATABASE_URL = "postgresql://citasatm_user:SlwK1sFIPJal7m8KaDtlRlYu1NseKxnV@dpg-ctdis2jv2p9s73ai7op0-a.oregon-postgres.render.com/citasatm_db"
     try:
-        conn = psycopg2.connect(
-            dbname="citasatm_user",
-            user="SlwK1sFIPJal7m8KaDtlRlYu1NseKxnV",
-            password="SlwK1sFIPJal7m8KaDtlRlYu1NseKxnV",
-            host="dpg-ctdis2jv2p9s73ai7op0-a",
-            port="5432"
-        )
+        # Intentar conectar a la base de datos
+        conn = psycopg2.connect(DATABASE_URL, cursor_factory=RealDictCursor)
         return conn
-    except psycopg2.OperationalError as e:
+    except Exception as e:
+        # Imprimir el error y volver a lanzarlo
         print(f"Error al conectar con la base de datos: {e}")
         raise
+
 def crear_tablas():
-    conn = conectar_db()  # Usa tu función conectar_db existente
+    conn = get_db_connection()  # Usa tu función conectar_db existente
     cursor = conn.cursor()
 
     # Comando SQL para crear la tabla `activos`
@@ -62,7 +60,7 @@ def crear_tablas():
 # Página principal con búsqueda y filtrado
 @app.route("/", methods=["GET", "POST"])
 def index():
-    conn = conectar_db()
+    conn = get_db_connection()
     cursor = conn.cursor()
 
     # Verificar si hay búsqueda o filtros aplicados
@@ -86,7 +84,7 @@ def index():
     conn.close()
 
     # Obtener opciones únicas para filtrar por estado
-    conn = conectar_db()
+    conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute("SELECT DISTINCT estado FROM activos")
     estados = [row[0] for row in cursor.fetchall()]
@@ -115,7 +113,7 @@ def registrar():
         fecha = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
         # Insertar en la base de datos
-        conn = conectar_db()
+        conn = get_db_connection()
         cursor = conn.cursor()
         cursor.execute("""
         INSERT INTO activos (codigo, nombre, ubicacion, estado, responsable, predio, marca, serie, fecha_actualizacion)
@@ -132,7 +130,7 @@ def registrar():
 # Ver detalles de un activo
 @app.route("/activo/<int:id>")
 def ver_activo(id):
-    conn = conectar_db()
+    conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM activos WHERE id = ?", (id,))
     activo = cursor.fetchone()
@@ -142,7 +140,7 @@ def ver_activo(id):
 # Editar un activo con autorización
 @app.route("/editar/<int:id>", methods=["GET", "POST"])
 def editar_activo(id):
-    conn = conectar_db()
+    conn = get_db_connection()
     cursor = conn.cursor()
 
     if request.method == "POST":
@@ -188,7 +186,7 @@ def eliminar_activo(id):
             return render_template("eliminar.html", id=id, error="Código de autorización incorrecto.")
 
         # Eliminar el activo
-        conn = conectar_db()
+        conn = get_db_connection()
         cursor = conn.cursor()
         cursor.execute("DELETE FROM activos WHERE id = ?", (id,))
         conn.commit()
@@ -200,7 +198,7 @@ def eliminar_activo(id):
 
 @app.route("/generar_qr/<int:id>")
 def generar_qr_activo(id):
-    conn = conectar_db()
+    conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute("SELECT codigo, nombre FROM activos WHERE id = ?", (id,))
     activo = cursor.fetchone()
@@ -241,7 +239,7 @@ def generar_codigo_qr(codigo, nombre):
 
 @app.route("/exportar_excel")
 def exportar_excel():
-    conn = conectar_db()
+    conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM activos")
     data = cursor.fetchall()
