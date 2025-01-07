@@ -17,8 +17,18 @@ AUTHORIZED_CODE = "atm2406"  # Código de autorización para modificar y elimina
 
 # Conexión a la base de datos
 def conectar_db():
-    conn = psycopg2.connect("postgres://SlwK1sFIPJal7m8KaDtlRlYu1NseKxnV:SlwK1sFIPJal7m8KaDtlRlYu1NseKxnV@dpg-ctdis2jv2p9s73ai7op0-a:5432/citasatm_user")
-    return conn
+    try:
+        conn = psycopg2.connect(
+            dbname="citasatm_user",
+            user="SlwK1sFIPJal7m8KaDtlRlYu1NseKxnV",
+            password="SlwK1sFIPJal7m8KaDtlRlYu1NseKxnV",
+            host="dpg-ctdis2jv2p9s73ai7op0-a",
+            port="5432"
+        )
+        return conn
+    except psycopg2.OperationalError as e:
+        print(f"Error al conectar con la base de datos: {e}")
+        raise
 def crear_tablas():
     conn = conectar_db()  # Usa tu función conectar_db existente
     cursor = conn.cursor()
