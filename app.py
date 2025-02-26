@@ -10,7 +10,7 @@ from io import BytesIO
 app = Flask(__name__)
 
 # Configuración de la base de datos PostgreSQL
-DATABASE_URL = "postgresql://citasatm_user:SlwK1sFIPJal7m8KaDtlRlYu1NseKxnV@dpg-ctdis2jv2p9s73ai7op0-a.oregon-postgres.render.com/citasatm_db"
+DATABASE_URL = os.environ.get("DATABASE_URL", "postgresql://citasatm_user:SlwK1sFIPJal7m8KaDtlRlYu1NseKxnV@dpg-ctdis2jv2p9s73ai7op0-a.oregon-postgres.render.com/citasatm_db")
 AUTHORIZED_CODE = "atm2406"  # Código de autorización para modificar y eliminar
 
 # Función para conectar a la base de datos
@@ -144,9 +144,14 @@ def exportar_excel():
     data = cursor.fetchall()
     conn.close()
 
-    columnas = ["ID", "Código", "Nombre", "Ubicación", "Estado", "Responsable", "Fecha Actualización", "Predio", "Marca", "Serie"]
-    
-    df = pd.DataFrame([{col: row[col] for col in columnas} for row in data])
+    # Verifica que hay datos antes de intentar crear el DataFrame
+    if not data:
+        return "No hay datos para exportar.", 404
+
+    # Extraer nombres de columnas de la consulta
+    columnas = list(data[0].keys())
+
+    df = pd.DataFrame(data, columns=columnas)
 
     output = BytesIO()
     with pd.ExcelWriter(output, engine="openpyxl") as writer:
