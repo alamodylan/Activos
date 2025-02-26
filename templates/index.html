@@ -1,4 +1,3 @@
-index.html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -25,42 +24,8 @@ index.html
         }
 
         h1 img {
-            height: 60px; /* Ajusta el tamaño del logo */
+            height: 60px;
             vertical-align: middle;
-        }
-
-        h2 {
-            text-align: center;
-            color: #555;
-            margin-top: 0;
-            font-size: 18px;
-        }
-
-        .search-filter {
-            max-width: 800px;
-            margin: 20px auto;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .search-filter input, .search-filter select, .search-filter button {
-            padding: 10px;
-            font-size: 14px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-        }
-
-        .search-filter button {
-            background-color: #007BFF;
-            color: white;
-            border: none;
-            cursor: pointer;
-        }
-
-        .search-filter button:hover {
-            background-color: #0056b3;
         }
 
         .table-container {
@@ -87,18 +52,6 @@ index.html
             border: 1px solid #ddd;
         }
 
-        table th {
-            font-weight: bold;
-        }
-
-        table tr:nth-child(even) {
-            background-color: #f9f9f9;
-        }
-
-        table tr:hover {
-            background-color: #f1f1f1;
-        }
-
         .actions {
             display: flex;
             gap: 5px;
@@ -113,64 +66,6 @@ index.html
             font-weight: bold;
             color: white;
         }
-
-        .actions .view {
-            background-color: #17a2b8;
-        }
-
-        .actions .view:hover {
-            background-color: #138496;
-        }
-
-        .actions .edit {
-            background-color: #ffc107;
-        }
-
-        .actions .edit:hover {
-            background-color: #e0a800;
-        }
-
-        .actions .delete {
-            background-color: #dc3545;
-        }
-
-        .actions .delete:hover {
-            background-color: #c82333;
-        }
-
-        .new-asset {
-            display: block;
-            text-align: center;
-            margin: 20px auto;
-            background-color: #28a745;
-            color: white;
-            padding: 10px 20px;
-            border-radius: 4px;
-            text-decoration: none;
-            font-weight: bold;
-            font-size: 16px;
-        }
-
-        .new-asset:hover {
-            background-color: #218838;
-        }
-
-        .export-link {
-            display: block;
-            text-align: center;
-            margin: 10px auto;
-            background-color: #16c258;
-            color: white;
-            padding: 10px 20px;
-            border-radius: 4px;
-            text-decoration: none;
-            font-weight: bold;
-            font-size: 16px;
-        }
-
-        .export-link:hover {
-            background-color: #0056b3;
-        }
     </style>
 </head>
 <body>
@@ -180,24 +75,6 @@ index.html
     </h1>
     <h2>Lista de Activos</h2>
 
-    <!-- Barra de búsqueda y filtros -->
-    <div class="search-filter">
-        <form method="GET" action="/" style="display: flex; flex: 1; gap: 10px;">
-            <input type="text" name="search" placeholder="Buscar por nombre, ubicación, predio..." value="{{ search_query }}">
-            <select name="estado">
-                <option value="">-- Filtrar por estado --</option>
-                {% for estado in estados %}
-                <option value="{{ estado }}" {% if filter_estado == estado %}selected{% endif %}>{{ estado }}</option>
-                {% endfor %}
-            </select>
-            <button type="submit">Buscar</button>
-        </form>
-    </div>
-
-    <!-- Enlace para exportar a Excel -->
-    <a href="/exportar_excel" class="export-link">Exportar a Excel</a>
-
-    <!-- Tabla de activos -->
     <div class="table-container">
         <table>
             <thead>
@@ -215,17 +92,17 @@ index.html
             <tbody>
                 {% for activo in activos %}
                 <tr>
-                    <td>{{ activo[1] }}</td>
-                    <td>{{ activo[2] }}</td>
-                    <td>{{ activo[3] }}</td>
-                    <td>{{ activo[4] }}</td>
-                    <td>{{ activo[7] }}</td>
-                    <td>{{ activo[8] }}</td>
-                    <td>{{ activo[9] }}</td>
+                    <td>{{ activo["codigo"] }}</td>
+                    <td>{{ activo["nombre"] }}</td>
+                    <td>{{ activo["ubicacion"] }}</td>
+                    <td>{{ activo["estado"] }}</td>
+                    <td>{{ activo["predio"] }}</td>
+                    <td>{{ activo["marca"] }}</td>
+                    <td>{{ activo["serie"] }}</td>
                     <td class="actions">
-                        <a href="/activo/{{ activo[0] }}" class="view">Ver</a>
-                        <a href="/editar/{{ activo[0] }}" class="edit">Editar</a>
-                        <a href="/eliminar/{{ activo[0] }}" class="delete">Eliminar</a>
+                        <a href="/activo/{{ activo['id'] }}" class="view">Ver</a>
+                        <a href="/editar/{{ activo['id'] }}" class="edit">Editar</a>
+                        <a href="/eliminar/{{ activo['id'] }}" class="delete">Eliminar</a>
                     </td>
                 </tr>
                 {% endfor %}
@@ -237,8 +114,5 @@ index.html
             </tbody>
         </table>
     </div>
-
-    <!-- Enlace para registrar un nuevo activo -->
-    <a href="/registrar" class="new-asset">Registrar Nuevo Activo</a>
 </body>
 </html>
