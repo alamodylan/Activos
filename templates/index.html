@@ -66,11 +66,35 @@
             font-weight: bold;
             color: white;
         }
+
+        .actions .view {
+            background-color: #17a2b8;
+        }
+
+        .actions .view:hover {
+            background-color: #138496;
+        }
+
+        .actions .edit {
+            background-color: #ffc107;
+        }
+
+        .actions .edit:hover {
+            background-color: #e0a800;
+        }
+
+        .actions .delete {
+            background-color: #dc3545;
+        }
+
+        .actions .delete:hover {
+            background-color: #c82333;
+        }
     </style>
 </head>
 <body>
     <h1>
-        <img src="{{ url_for('static', filename='logoalamo.png') }}" alt="Logo de la Empresa">
+        <img src="{{ url_for('static', filename='LogoAlamo.png') }}" alt="Logo de la Empresa">
         Alamo Terminales Marítimos
     </h1>
     <h2>Lista de Activos</h2>
