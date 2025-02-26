@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -28,6 +28,40 @@
             vertical-align: middle;
         }
 
+        h2 {
+            text-align: center;
+            color: #555;
+            margin-top: 0;
+            font-size: 18px;
+        }
+
+        .search-filter {
+            max-width: 800px;
+            margin: 20px auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .search-filter input, .search-filter select, .search-filter button {
+            padding: 10px;
+            font-size: 14px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .search-filter button {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        .search-filter button:hover {
+            background-color: #0056b3;
+        }
+
         .table-container {
             max-width: 1000px;
             margin: 20px auto;
@@ -52,19 +86,33 @@
             border: 1px solid #ddd;
         }
 
+        table th {
+            font-weight: bold;
+        }
+
+        table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        table tr:hover {
+            background-color: #f1f1f1;
+        }
+
         .actions {
             display: flex;
             gap: 5px;
             justify-content: center;
         }
 
-        .actions a {
+        .actions a, .actions button {
             text-decoration: none;
             padding: 8px 12px;
             border-radius: 4px;
             font-size: 14px;
             font-weight: bold;
             color: white;
+            border: none;
+            cursor: pointer;
         }
 
         .actions .view {
@@ -90,17 +138,50 @@
         .actions .delete:hover {
             background-color: #c82333;
         }
+
+        .export-link {
+            display: block;
+            text-align: center;
+            margin: 10px auto;
+            background-color: #16c258;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 4px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .export-link:hover {
+            background-color: #0056b3;
+        }
     </style>
 </head>
 <body>
     <h1>
-        <img src="{{ url_for('static', filename='LogoAlamo.png') }}" alt="Logo de la Empresa">
+        <img src="{{ url_for('static', filename='images/logoalamo.png') }}" alt="Logo de la Empresa">
         Alamo Terminales Marítimos
     </h1>
-    <h2 style="text-align: center; margin-top: 10px; font-size: 22px; font-weight: bold;">
-        Lista de Activos
-    </h2>
+    <h2 style="text-align: center;">Lista de Activos</h2>
 
+    <!-- Barra de búsqueda y filtros -->
+    <div class="search-filter">
+        <form method="GET" action="/" style="display: flex; flex: 1; gap: 10px;">
+            <input type="text" name="search" placeholder="Buscar por nombre, ubicación, predio..." value="{{ search_query }}">
+            <select name="estado">
+                <option value="">-- Filtrar por estado --</option>
+                {% for estado in estados %}
+                <option value="{{ estado }}" {% if filter_estado == estado %}selected{% endif %}>{{ estado }}</option>
+                {% endfor %}
+            </select>
+            <button type="submit">Buscar</button>
+        </form>
+    </div>
+
+    <!-- Enlace para exportar a Excel -->
+    <a href="/exportar_excel" class="export-link">Exportar a Excel</a>
+
+    <!-- Tabla de activos -->
     <div class="table-container">
         <table>
             <thead>
@@ -126,9 +207,11 @@
                     <td>{{ activo["marca"] }}</td>
                     <td>{{ activo["serie"] }}</td>
                     <td class="actions">
-                        <a href="/activo/{{ activo['id'] }}" class="view">Ver</a>
-                        <a href="/editar/{{ activo['id'] }}" class="edit">Editar</a>
-                        <a href="/eliminar/{{ activo['id'] }}" class="delete">Eliminar</a>
+                        <a href="{{ url_for('ver_activo', id=activo['id']) }}" class="view">Ver</a>
+                        <a href="{{ url_for('editar_activo', id=activo['id']) }}" class="edit">Editar</a>
+                        <form action="{{ url_for('eliminar_activo', id=activo['id']) }}" method="POST" style="display:inline;">
+                            <button type="submit" class="delete" onclick="return confirm('¿Seguro que quieres eliminar este activo?');">Eliminar</button>
+                        </form>
                     </td>
                 </tr>
                 {% endfor %}
@@ -140,5 +223,8 @@
             </tbody>
         </table>
     </div>
+
+    <!-- Enlace para registrar un nuevo activo -->
+    <a href="/registrar" class="export-link" style="background-color: #28a745;">Registrar Nuevo Activo</a>
 </body>
 </html>
