@@ -159,7 +159,7 @@
 </head>
 <body>
     <h1>
-        <img src="{{ url_for('static', filename='images/logoalamo.png') }}" alt="Logo de la Empresa">
+        <img src="{{ url_for('static', filename='LogoAlamo.png') }}" alt="Logo de la Empresa">
         Alamo Terminales Marítimos
     </h1>
     <h2 style="text-align: center;">Lista de Activos</h2>
@@ -179,7 +179,10 @@
     </div>
 
     <!-- Enlace para exportar a Excel -->
-    <a href="/exportar_excel" class="export-link">Exportar a Excel</a>
+    <a href="/exportar_excel" class="export-link">
+        <img src="{{ url_for('static', filename='LogoExcel-icon.png') }}" alt="Excel" class="icon">
+        Exportar a Excel
+    </a>
 
     <!-- Tabla de activos -->
     <div class="table-container">
