@@ -173,8 +173,8 @@
         }
 
         .export-link .icon {
-            width: 16px; /* Tamaño pequeño del icono */
-            height: 16px;
+            width: 24px; /* Aumenta el tamaño */
+    height: 24px;
         }
     </style>
 </head>
@@ -200,10 +200,12 @@
     </div>
 
     <!-- Enlace para exportar a Excel -->
+    <div class="button-container">
     <a href="/exportar_excel" class="export-link">
         <img src="{{ url_for('static', filename='LogoExcel.png') }}" alt="Excel" class="icon">
         Exportar a Excel
     </a>
+    </div>
 
     <!-- Tabla de activos -->
     <div class="table-container">
@@ -249,6 +251,6 @@
     </div>
 
     <!-- Enlace para registrar un nuevo activo -->
-    <a href="/registrar" class="export-link" style="background-color: #28a745;">Registrar Nuevo Activo</a>
+    <a href="/registrar" class="export-link new-asset" style="background-color: #28a745;">Registrar Nuevo Activo</a>
 </body>
 </html>
