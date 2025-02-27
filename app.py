@@ -6,6 +6,7 @@ from datetime import datetime
 import qrcode
 import pandas as pd
 from io import BytesIO
+import openpyxl
 
 app = Flask(__name__)
 
