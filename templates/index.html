@@ -173,8 +173,16 @@
         }
 
         .export-link .icon {
-            width: 24px; /* Aumenta el tamaño */
-    height: 24px;
+            width: 30px; /* Aumenta el tamaño */
+    height: 30px;
+        }
+        .button-container {
+            display: flex;
+            justify-content: center; /* Centra los botones horizontalmente */
+            align-items: center;
+            gap: 15px; /* Espaciado entre botones */
+            margin-bottom: 15px; /* Espacio antes de la tabla */
+            margin-top: -10px; /* Ajusta la altura si es necesario */
         }
     </style>
 </head>
@@ -205,6 +213,7 @@
         <img src="{{ url_for('static', filename='LogoExcel.png') }}" alt="Excel" class="icon">
         Exportar a Excel
     </a>
+    <a href="/registrar" class="export-link new-asset" style="background-color: #28a745;">Registrar Nuevo Activo</a>
     </div>
 
     <!-- Tabla de activos -->
@@ -251,6 +260,5 @@
     </div>
 
     <!-- Enlace para registrar un nuevo activo -->
-    <a href="/registrar" class="export-link new-asset" style="background-color: #28a745;">Registrar Nuevo Activo</a>
 </body>
 </html>
