@@ -143,6 +143,57 @@ def ver_activo(id):
     activo = cursor.fetchone()
     conn.close()
     return render_template("activo.html", activo=activo)
+@app.route("/editar/<int:id>", methods=["GET", "POST"])
+def editar_activo(id):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    if request.method == "POST":
+        codigo_autorizacion = request.form.get("codigo_autorizacion")
+        if codigo_autorizacion != AUTHORIZED_CODE:
+            return render_template("editar.html", activo={"id": id}, error="Código de autorización incorrecto.")
+
+        codigo = request.form["codigo"]
+        nombre = request.form["nombre"]
+        ubicacion = request.form["ubicacion"]
+        estado = request.form["estado"]
+        responsable = request.form["responsable"]
+        predio = request.form["predio"]
+        marca = request.form["marca"]
+        serie = request.form["serie"]
+        fecha = datetime.now()
+
+        cursor.execute("""
+        UPDATE activos
+        SET codigo = %s, nombre = %s, ubicacion = %s, estado = %s, responsable = %s, predio = %s, marca = %s, serie = %s, fecha_actualizacion = %s
+        WHERE id = %s
+        """, (codigo, nombre, ubicacion, estado, responsable, predio, marca, serie, fecha, id))
+
+        conn.commit()
+        conn.close()
+        return redirect(url_for("index"))
+
+    cursor.execute("SELECT * FROM activos WHERE id = %s", (id,))
+    activo = cursor.fetchone()
+    conn.close()
+
+    return render_template("editar.html", activo=activo)
+@app.route("/eliminar/<int:id>", methods=["POST"])
+def eliminar_activo(id):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    try:
+        cursor.execute("DELETE FROM activos WHERE id = %s", (id,))
+        conn.commit()
+        print(f"✅ Activo con ID {id} eliminado correctamente.")
+    except Exception as e:
+        print(f"❌ Error al eliminar activo: {e}")
+    finally:
+        cursor.close()
+        conn.close()
+
+    return redirect(url_for("index"))
 
 # Exportar activos a Excel
 @app.route("/exportar_excel")
