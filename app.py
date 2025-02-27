@@ -108,47 +108,50 @@ def registrar():
         conn.commit()
         conn.close()
 
-        generar_codigo_qr(codigo, nombre)
+        generar_qr_activo(codigo, nombre)
         return redirect(url_for("index"))
 
     return render_template("registrar.html")
 
-# Generar código QR
-def generar_codigo_qr(codigo, nombre):
-    qr_folder = "static/qr-codes"
+
+@app.route("/generar_qr/<int:id>")
+def generar_qr_activo(id):
+    conn = get_db_connection()
+    cursor = conn.cursor(cursor_factory=RealDictCursor)
+    cursor.execute("SELECT codigo FROM activos WHERE id = %s", (id,))
+    activo = cursor.fetchone()
+    conn.close()
+
+    if not activo:
+        return "Activo no encontrado", 404
+
+    codigo = activo["codigo"]
+
+    # Carpeta donde se guardarán los QR
+    qr_folder = "static/QR-Codes"
     if not os.path.exists(qr_folder):
         os.makedirs(qr_folder)
 
+    # URL única para cada activo
     url_base = "https://tudominio.com/activo"
-    contenido = f"{url_base}/{codigo}"
+    contenido_qr = f"{url_base}/{id}"
 
+    # Generar QR
     qr = qrcode.QRCode(
         version=1,
         error_correction=qrcode.constants.ERROR_CORRECT_L,
         box_size=10,
         border=4,
     )
-    qr.add_data(contenido)
+    qr.add_data(contenido_qr)
     qr.make(fit=True)
 
-    img = qr.make_image(fill_color="black", back_color="white")
+    # Guardar la imagen del QR
     qr_path = os.path.join(qr_folder, f"{codigo}.png")
+    img = qr.make_image(fill_color="black", back_color="white")
     img.save(qr_path)
-    print(f"✅ Código QR generado: {qr_path} -> {contenido}")
-@app.route("/generar_qr/<int:id>")
-def generar_qr_activo(id):
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    cursor.execute("SELECT codigo, nombre FROM activos WHERE id = %s", (id,))
-    activo = cursor.fetchone()
-    conn.close()
 
-    if activo:
-        codigo, nombre = activo["codigo"], activo["nombre"]
-        generar_codigo_qr(codigo, nombre)
-        return redirect(url_for("ver_activo", id=id))
-    else:
-        return "Activo no encontrado", 404
+    return redirect(url_for('ver_activo', id=id))
 
 @app.route("/activo/<int:id>")
 def ver_activo(id):

@@ -99,7 +99,7 @@
 
     <!-- Mostrar el código QR si ya existe -->
     <h2>Código QR</h2>
-    <img src="/static/qr-codes/{{ activo[1] }}.png" alt="Código QR del activo" style="width:200px;height:200px;">
+<img src="{{ url_for('static', filename='QR-Codes/' + activo['codigo'] + '.png') }}" alt="Código QR del activo">
 
     <!-- Enlace para volver -->
     <div class="actions">
