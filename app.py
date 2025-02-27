@@ -153,10 +153,14 @@ def generar_qr_activo(id):
 @app.route("/activo/<int:id>")
 def ver_activo(id):
     conn = get_db_connection()
-    cursor = conn.cursor()
+    cursor = conn.cursor(cursor_factory=RealDictCursor)  # Esto hace que retorne un diccionario
     cursor.execute("SELECT * FROM activos WHERE id = %s", (id,))
     activo = cursor.fetchone()
     conn.close()
+
+    if not activo:
+        return "Activo no encontrado", 404
+
     return render_template("activo.html", activo=activo)
 @app.route("/editar/<int:id>", methods=["GET", "POST"])
 def editar_activo(id):

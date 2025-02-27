@@ -78,16 +78,16 @@
 <body>
     <h1>Detalles del Activo</h1>
     <div class="details">
-        <p><strong>ID:</strong> {{ activo[0] }}</p>
-        <p><strong>Número de Activo:</strong> {{ activo[1] }}</p>
-        <p><strong>Nombre:</strong> {{ activo[2] }}</p>
-        <p><strong>Ubicación:</strong> {{ activo[3] }}</p>
-        <p><strong>Estado:</strong> {{ activo[4] }}</p>
-        <p><strong>Responsable:</strong> {{ activo[5] }}</p>
-        <p><strong>Última actualización:</strong> {{ activo[6] }}</p>
-        <p><strong>Predio:</strong> {{ activo[7] }}</p>
-        <p><strong>Marca:</strong> {{ activo[8] }}</p>
-        <p><strong>Serie:</strong> {{ activo[9] }}</p>
+        <p><strong>ID:</strong> {{ activo["id"] }}</p>
+        <p><strong>Número de Activo:</strong> {{ activo["codigo"] }}</p>
+        <p><strong>Nombre:</strong> {{ activo["nombre"] }}</p>
+        <p><strong>Ubicación:</strong> {{ activo["ubicacion"] }}</p>
+        <p><strong>Estado:</strong> {{ activo["estado"] }}</p>
+        <p><strong>Responsable:</strong> {{ activo["responsable"] }}</p>
+        <p><strong>Última actualización:</strong> {{ activo["fecha_actualizacion"] }}</p>
+        <p><strong>Predio:</strong> {{ activo["predio"] }}</p>
+        <p><strong>Marca:</strong> {{ activo["marca"] }}</p>
+        <p><strong>Serie:</strong> {{ activo["serie"] }}</p>
     </div>
 
     <!-- Botón para generar o actualizar el código QR -->
