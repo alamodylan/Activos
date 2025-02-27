@@ -135,6 +135,20 @@ def generar_codigo_qr(codigo, nombre):
     qr_path = os.path.join(qr_folder, f"{codigo}.png")
     img.save(qr_path)
     print(f"✅ Código QR generado: {qr_path} -> {contenido}")
+@app.route("/generar_qr/<int:id>")
+def generar_qr_activo(id):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT codigo, nombre FROM activos WHERE id = %s", (id,))
+    activo = cursor.fetchone()
+    conn.close()
+
+    if activo:
+        codigo, nombre = activo["codigo"], activo["nombre"]
+        generar_codigo_qr(codigo, nombre)
+        return redirect(url_for("ver_activo", id=id))
+    else:
+        return "Activo no encontrado", 404
 
 @app.route("/activo/<int:id>")
 def ver_activo(id):
