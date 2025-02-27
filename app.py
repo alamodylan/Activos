@@ -135,6 +135,15 @@ def generar_codigo_qr(codigo, nombre):
     img.save(qr_path)
     print(f"✅ Código QR generado: {qr_path} -> {contenido}")
 
+@app.route("/activo/<int:id>")
+def ver_activo(id):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM activos WHERE id = %s", (id,))
+    activo = cursor.fetchone()
+    conn.close()
+    return render_template("activo.html", activo=activo)
+
 # Exportar activos a Excel
 @app.route("/exportar_excel")
 def exportar_excel():
