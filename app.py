@@ -108,7 +108,7 @@ def registrar():
         conn.commit()
         conn.close()
 
-        generar_qr_activo(codigo, nombre)
+        generar_qr_activo(id)
         return redirect(url_for("index"))
 
     return render_template("registrar.html")
