@@ -209,13 +209,23 @@
 
     <!-- Enlace para exportar a Excel -->
     <div class="button-container">
-    <a href="/exportar_excel" class="export-link">
-        <img src="{{ url_for('static', filename='LogoExcel.png') }}" alt="Excel" class="icon">
-        Exportar a Excel
-    </a>
+    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+
+    <!-- Exportar a Excel (izquierda) -->
+    <div style="text-align: left;">
+        <a href="/exportar_excel" class="export-link">
+            <img src="{{ url_for('static', filename='LogoExcel.png') }}" alt="Excel" class="icon">
+            Exportar a Excel
+        </a>
+    </div>
+
+    <!-- Tu botón original sin cambios -->
     <form method="GET" action="/registrar" onsubmit="return confirmarCodigo();" style="display:inline;">
-        <button type="submit" class="export-link new-asset" style="background-color: #06a5a5;">Registrar Nuevo Activo</button>
+        <button type="submit" class="export-link new-asset" style="background-color: #06a5a5;">
+            Registrar Nuevo Activo
+        </button>
     </form>
+</div>
     </div>
 
     <!-- Tabla de activos -->
