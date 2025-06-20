@@ -207,26 +207,27 @@
         </form>
     </div>
 
-    <!-- Enlace para exportar a Excel -->
-    <div class="button-container">
-    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+<div style="display: flex; justify-content: space-between; width: 100%; margin-bottom: 10px;">
+  
+  <!-- Exportar a Excel (alineado con la primera columna) -->
+  <div style="flex: 0 0 auto;">
+    <a href="/exportar_excel" class="export-link">
+      <img src="{{ url_for('static', filename='LogoExcel.png') }}" alt="Excel" class="icon">
+      Exportar a Excel
+    </a>
+  </div>
 
-    <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 5px;">
-    
-    <!-- Alineado sobre "Número de Activo" -->
-    <div style="margin-left: 15px;">
-        <a href="/exportar_excel" class="export-link">
-            <img src="{{ url_for('static', filename='LogoExcel.png') }}" alt="Excel" class="icon">
-            Exportar a Excel
-        </a>
-    </div>
+  <!-- Espaciador para mantener al centro los filtros o títulos si los hay -->
+  <div style="flex-grow: 1;"></div>
 
-    <!-- Alineado sobre "Acciones" -->
-    <div style="margin-right: 15px;">
-        <form method="GET" action="/registrar" onsubmit="return confirmarCodigo();" style="display:inline;">
-            <button type="submit" class="export-link new-asset" style="background-color: #06a5a5;">Registrar Nuevo Activo</button>
-        </form>
-    </div>
+  <!-- Registrar Nuevo Activo (alineado con la última columna) -->
+  <div style="flex: 0 0 auto;">
+    <form method="GET" action="/registrar" onsubmit="return confirmarCodigo();" style="display:inline;">
+      <button type="submit" class="export-link new-asset" style="background-color: #06a5a5;">
+        Registrar Nuevo Activo
+      </button>
+    </form>
+  </div>
 </div>
 
     <!-- Tabla de activos -->
