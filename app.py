@@ -132,8 +132,8 @@ def generar_qr_activo(id):
     if not os.path.exists(qr_folder):
         os.makedirs(qr_folder)
 
-    # URL única para cada activo
-    url_base = "https://tudominio.com/activo"
+    # ✅ URL única para cada activo (URL real de tu app)
+    url_base = "https://activos.onrender.com/activo"
     contenido_qr = f"{url_base}/{id}"
 
     # Generar QR
