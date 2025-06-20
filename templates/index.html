@@ -244,8 +244,9 @@
                     <td class="actions">
                         <a href="{{ url_for('ver_activo', id=activo['id']) }}" class="view">Ver</a>
                         <a href="{{ url_for('editar_activo', id=activo['id']) }}" class="edit">Editar</a>
-                        <form action="{{ url_for('eliminar_activo', id=activo['id']) }}" method="POST" style="display:inline;">
-                            <button type="submit" class="delete" onclick="return confirm('¿Seguro que quieres eliminar este activo?');">Eliminar</button>
+                        <form method="POST" action="{{ url_for('eliminar_activo', id=activo['id']) }}" style="display:inline;" onsubmit="return confirmarEliminacion(this);">
+                            <input type="hidden" name="codigo_confirmacion" value="">
+                            <button type="submit" class="delete">Eliminar</button>
                         </form>
                     </td>
                 </tr>
@@ -260,5 +261,20 @@
     </div>
 
     <!-- Enlace para registrar un nuevo activo -->
+<script>
+function confirmarEliminacion(form) {
+    const codigo = prompt("Ingrese el código de autorización para eliminar:");
+    if (codigo === null) return false;  // Cancelado
+
+    if (codigo !== "atm2406") {
+        alert("Código incorrecto. No se puede eliminar.");
+        return false;
+    }
+
+    // Insertamos el código correcto en el input oculto
+    form.querySelector('input[name="codigo_confirmacion"]').value = codigo;
+    return true;
+}
+</script>
 </body>
 </html>
