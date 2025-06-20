@@ -213,7 +213,9 @@
         <img src="{{ url_for('static', filename='LogoExcel.png') }}" alt="Excel" class="icon">
         Exportar a Excel
     </a>
-    <a href="/registrar" class="export-link new-asset" style="background-color: #06a5a5;">Registrar Nuevo Activo</a>
+    <form method="GET" action="/registrar" onsubmit="return confirmarCodigo();" style="display:inline;">
+        <button type="submit" class="export-link new-asset" style="background-color: #06a5a5;">Registrar Nuevo Activo</button>
+    </form>
     </div>
 
     <!-- Tabla de activos -->
@@ -243,7 +245,9 @@
                     <td>{{ activo["serie"] }}</td>
                     <td class="actions">
                         <a href="{{ url_for('ver_activo', id=activo['id']) }}" class="view">Ver</a>
-                        <a href="{{ url_for('editar_activo', id=activo['id']) }}" class="edit">Editar</a>
+                        <form method="GET" action="{{ url_for('editar_activo', id=activo['id']) }}" onsubmit="return confirmarCodigo();" style="display:inline;">
+                            <button type="submit" class="edit">Editar</button>
+                        </form>
                         <form method="POST" action="{{ url_for('eliminar_activo', id=activo['id']) }}" style="display:inline;" onsubmit="return confirmarEliminacion(this);">
                             <input type="hidden" name="codigo_confirmacion" value="">
                             <button type="submit" class="delete">Eliminar</button>
@@ -273,6 +277,17 @@ function confirmarEliminacion(form) {
 
     // Insertamos el código correcto en el input oculto
     form.querySelector('input[name="codigo_confirmacion"]').value = codigo;
+    return true;
+}
+</script>
+<script>
+function confirmarCodigo() {
+    const codigo = prompt("Ingrese el código de autorización:");
+    if (codigo === null) return false; // Cancelado
+    if (codigo !== "atm2406") {
+        alert("Código incorrecto.");
+        return false;
+    }
     return true;
 }
 </script>

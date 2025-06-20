@@ -201,6 +201,12 @@ def editar_activo(id):
     return render_template("editar.html", activo=activo)
 @app.route("/eliminar/<int:id>", methods=["POST"])
 def eliminar_activo(id):
+    codigo = request.form.get("codigo_confirmacion", "")
+
+    if codigo != "atm2406":
+        print("❌ Código de autorización incorrecto. Eliminación cancelada.")
+        return redirect(url_for("index"))
+
     conn = get_db_connection()
     cursor = conn.cursor()
 
