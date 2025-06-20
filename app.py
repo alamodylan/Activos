@@ -171,8 +171,7 @@ def editar_activo(id):
 
     if request.method == "POST":
         codigo_autorizacion = request.form.get("codigo_autorizacion")
-        if codigo_autorizacion != AUTHORIZED_CODE:
-            return render_template("editar.html", activo={"id": id}, error="Código de autorización incorrecto.")
+       
 
         codigo = request.form["codigo"]
         nombre = request.form["nombre"]
