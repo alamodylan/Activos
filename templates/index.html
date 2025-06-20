@@ -211,20 +211,21 @@
     <div class="button-container">
     <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
 
-    <!-- Exportar a Excel (izquierda) -->
-    <div style="text-align: left;">
-        <a href="/exportar_excel" class="export-link">
-            <img src="{{ url_for('static', filename='LogoExcel.png') }}" alt="Excel" class="icon">
-            Exportar a Excel
-        </a>
-    </div>
+    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
 
-    <!-- Tu botón original sin cambios -->
+    <!-- Botón Exportar a Excel (a la izquierda, sobre "Número de Activo") -->
+    <a href="/exportar_excel" class="export-link">
+        <img src="{{ url_for('static', filename='LogoExcel.png') }}" alt="Excel" class="icon">
+        Exportar a Excel
+    </a>
+
+    <!-- Botón Registrar Nuevo Activo (a la derecha, sobre "Acciones") -->
     <form method="GET" action="/registrar" onsubmit="return confirmarCodigo();" style="display:inline;">
         <button type="submit" class="export-link new-asset" style="background-color: #06a5a5;">
             Registrar Nuevo Activo
         </button>
     </form>
+
 </div>
     </div>
 
