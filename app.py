@@ -102,7 +102,7 @@ def registrar():
             RETURNING id
         """, (codigo, nombre, ubicacion, estado, responsable, predio, marca, serie))
 
-        nuevo_id = cursor.fetchone()[0]  # ✅ Obtener el ID del nuevo activo
+        nuevo_id = cursor.fetchone()["id"]  # ✅ Obtener el ID del nuevo activo
         conn.commit()
         conn.close()
 
