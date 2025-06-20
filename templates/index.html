@@ -207,24 +207,22 @@
         </form>
     </div>
 
-<div style="display: flex; justify-content: space-between; width: 100%; margin-bottom: 10px;">
   
-  <!-- Exportar a Excel (alineado con la primera columna) -->
- <div style="display: flex; justify-content: space-between; width: 100%; margin-bottom: 10px; align-items: center;">
-
-  <!-- Exportar a Excel (un poco más a la derecha) -->
-  <div style="margin-left: 60px;">
+<div style="display: flex; justify-content: space-between; width: 90%; margin: 0 auto 10px auto;">
+  
+  <!-- Exportar a Excel (más centrado hacia el inicio de la tabla) -->
+  <div style="flex: 0 0 auto;">
     <a href="/exportar_excel" class="export-link">
       <img src="{{ url_for('static', filename='LogoExcel.png') }}" alt="Excel" class="icon">
       Exportar a Excel
     </a>
   </div>
 
-  <!-- Espaciador para mantener al centro los filtros o títulos si los hay -->
+  <!-- Espaciador para mantener centrado el medio -->
   <div style="flex-grow: 1;"></div>
 
-  <!-- Registrar Nuevo Activo (más a la izquierda) -->
-  <div style="margin-right: 60px;">
+  <!-- Registrar Nuevo Activo (más centrado hacia la última columna) -->
+  <div style="flex: 0 0 auto;">
     <form method="GET" action="/registrar" onsubmit="return confirmarCodigo();" style="display:inline;">
       <button type="submit" class="export-link new-asset" style="background-color: #06a5a5;">
         Registrar Nuevo Activo
