@@ -85,10 +85,6 @@ def index():
 @app.route("/registrar", methods=["GET", "POST"])
 def registrar():
     if request.method == "POST":
-        codigo_autorizacion = request.form.get("codigo_autorizacion")
-        if codigo_autorizacion != AUTHORIZED_CODE:
-            return render_template("registrar.html", error="Código de autorización incorrecto.")
-
         codigo = request.form["codigo"]
         nombre = request.form["nombre"]
         ubicacion = request.form["ubicacion"]
@@ -97,20 +93,23 @@ def registrar():
         predio = request.form["predio"]
         marca = request.form["marca"]
         serie = request.form["serie"]
-        fecha = datetime.now()
 
         conn = get_db_connection()
         cursor = conn.cursor()
         cursor.execute("""
-        INSERT INTO activos (codigo, nombre, ubicacion, estado, responsable, predio, marca, serie, fecha_actualizacion)
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
-        """, (codigo, nombre, ubicacion, estado, responsable, predio, marca, serie, fecha))
+            INSERT INTO activos (codigo, nombre, ubicacion, estado, responsable, fecha_actualizacion, predio, marca, serie)
+            VALUES (%s, %s, %s, %s, %s, CURRENT_TIMESTAMP, %s, %s, %s)
+            RETURNING id
+        """, (codigo, nombre, ubicacion, estado, responsable, predio, marca, serie))
+
+        nuevo_id = cursor.fetchone()[0]  # ✅ Obtener el ID del nuevo activo
         conn.commit()
         conn.close()
 
-        generar_qr_activo(id)
-        return redirect(url_for("index"))
+        generar_qr_activo(nuevo_id)  # ✅ Usar el ID real
 
+        return redirect(url_for("index"))
+    
     return render_template("registrar.html")
 
 
