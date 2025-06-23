@@ -23,6 +23,31 @@ def get_db_connection():
         print(f"❌ Error al conectar con la base de datos: {e}")
         raise
 
+def crear_tabla_entregas():
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS entregas (
+            id SERIAL PRIMARY KEY,
+            id_activo INTEGER REFERENCES activos(id),
+            persona_recibe TEXT NOT NULL,
+            fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            estado TEXT DEFAULT 'pendiente',
+            persona_envia TEXT NOT NULL,
+            departamento_envia TEXT NOT NULL
+        );
+    """)
+
+    conn.commit()
+    cursor.close()
+    conn.close()
+    
+    print("✅ Tabla 'entregas' verificada o creada correctamente.")
+
+# Llamar esta función al arrancar la app
+crear_tabla_entregas()
+
 # Crear la tabla activos si no existe
 def crear_tablas():
     conn = get_db_connection()
