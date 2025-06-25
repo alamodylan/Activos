@@ -70,8 +70,6 @@ def crear_tabla_desechos():
     cursor.close()
     conn.close()
 
-# Llamar esta función al arrancar la app
-crear_tabla_entregas()
 
 # Crear la tabla activos si no existe
 def crear_tablas():
@@ -300,7 +298,9 @@ def exportar_excel():
         as_attachment=True,
         download_name="Listado_Activos.xlsx"
     )
-
+crear_tablas()  # Activos
+crear_tabla_desechos()  # Desechados
+crear_tabla_bitacora_entregas()  # Bitácora de entregas
 if __name__ == "__main__":
     crear_tablas()
     app.run(host="0.0.0.0", port=8000, debug=True)
