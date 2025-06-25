@@ -23,27 +23,52 @@ def get_db_connection():
         print(f"❌ Error al conectar con la base de datos: {e}")
         raise
 
-def crear_tabla_entregas():
+def crear_tabla_bitacora_entregas():
     conn = get_db_connection()
     cursor = conn.cursor()
 
     cursor.execute("""
-        CREATE TABLE IF NOT EXISTS entregas (
+        CREATE TABLE IF NOT EXISTS bitacora_entregas (
             id SERIAL PRIMARY KEY,
             id_activo INTEGER REFERENCES activos(id),
             persona_recibe TEXT NOT NULL,
             fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             estado TEXT DEFAULT 'pendiente',
             persona_envia TEXT NOT NULL,
-            departamento_envia TEXT NOT NULL
+            departamento_envia TEXT NOT NULL,
+            predio_destino TEXT NOT NULL,
+            boleta_firmada BOOLEAN DEFAULT FALSE
         );
     """)
 
     conn.commit()
     cursor.close()
     conn.close()
-    
     print("✅ Tabla 'entregas' verificada o creada correctamente.")
+def eliminar_tabla_entregas():
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("DROP TABLE IF EXISTS entregas;")
+    conn.commit()
+    cursor.close()
+    conn.close()
+
+def crear_tabla_desechos():
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS activos_desechados (
+            id SERIAL PRIMARY KEY,
+            id_activo INTEGER REFERENCES activos(id),
+            fecha_desecho TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            usuario_desecha TEXT NOT NULL
+        );
+    """)
+
+    conn.commit()
+    cursor.close()
+    conn.close()
 
 # Llamar esta función al arrancar la app
 crear_tabla_entregas()
