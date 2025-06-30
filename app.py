@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, send_file
+from flask import Flask, render_template, request, redirect, url_for, send_file, flash
 import psycopg2
 from psycopg2.extras import RealDictCursor
 import os
@@ -7,7 +7,7 @@ import qrcode
 import pandas as pd
 from io import BytesIO
 import openpyxl
-
+CLAVE_DESECHO = "atm2406"
 app = Flask(__name__)
 
 # Configuración de la base de datos PostgreSQL
@@ -298,6 +298,51 @@ def exportar_excel():
         as_attachment=True,
         download_name="Listado_Activos.xlsx"
     )
+@app.route('/desechar_activo/<int:id_activo>', methods=['POST'])
+def desechar_activo(id_activo):
+    clave_ingresada = request.form.get('clave')
+    usuario_desecha = request.form.get('usuario_desecha')
+
+    if clave_ingresada != CLAVE_DESECHO:
+        flash('❌ Clave incorrecta. No se procesó el desecho.', 'danger')
+        return redirect(url_for('ver_activo', id= id_activo))
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    try:
+        cursor.execute("""
+            INSERT INTO activos_desechados (id_activo, usuario_desecha)
+            VALUES (%s, %s);
+        """, (id_activo, usuario_desecha))
+
+        cursor.execute("DELETE FROM activos WHERE id = %s;", (id_activo,))
+        conn.commit()
+        flash('✅ Activo enviado a desecho correctamente.', 'success')
+
+    except Exception as e:
+        conn.rollback()
+        flash(f'Error al desechar: {e}', 'danger')
+
+    finally:
+        cursor.close()
+        conn.close()
+
+    return redirect(url_for('ver_desechos'))
+@app.route('/ver_desechos')
+def ver_desechos():
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("""
+        SELECT ad.id, a.codigo, a.nombre, ad.fecha_desecho, ad.usuario_desecha
+        FROM activos_desechados ad
+        JOIN activos a ON ad.id_activo = a.id;
+    """)
+    desechados = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    return render_template('desechos.html', desechados=desechados)
+
 crear_tablas()  # Activos
 crear_tabla_desechos()  # Desechados
 crear_tabla_bitacora_entregas()  # Bitácora de entregas

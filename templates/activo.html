@@ -96,6 +96,41 @@
             <button>Generar Código QR</button>
         </a>
     </div>
+    <button class="btn btn-danger mt-3" data-bs-toggle="modal" data-bs-target="#modalDesecharActivo">
+    🗑️ Enviar a Desecho
+</button>
+
+<!-- MODAL para confirmar clave y quién desecha -->
+<div class="modal fade" id="modalDesecharActivo" tabindex="-1" aria-labelledby="modalDesecharActivoLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <form method="POST" action="{{ url_for('desechar_activo', id_activo=activo.id) }}">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalDesecharActivoLabel">Confirmar envío a desecho</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+        <div class="modal-body">
+          <p>Activo: <strong>{{ activo.nombre }}</strong> (Código: {{ activo.codigo }})</p>
+          
+          <label>🔐 Ingresá la clave de autorización:</label>
+          <input type="password" name="clave" class="form-control mb-3" placeholder="Clave de acceso" required>
+
+          <label>👤 ¿Quién desecha este activo?</label>
+          <select name="usuario_desecha" class="form-control" required>
+              <option value="">Seleccione una opción</option>
+              <option value="Dylan Bustos">Dylan Bustos</option>
+              <option value="Deynor Gonzalez">Deynor Gonzalez</option>
+              <option value="Lester Fuentes">Lester Fuentes</option>
+          </select>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-danger">Sí, Desechar</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
 
     <!-- Mostrar el código QR si ya existe -->
     <h2>Código QR</h2>
