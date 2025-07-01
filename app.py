@@ -331,8 +331,10 @@ def desechar_activo(id):
             # Eliminar de activos
             cur.execute("DELETE FROM activos WHERE id = %s", (id,))
             print(f"🗑️ Eliminado activo con ID: {id} de la tabla activos")
-            
+
+            print("🔥 Ejecutando commit del desecho...")
             conn.commit()
+
             flash('✅ Activo desechado correctamente.', 'success')
         else:
             flash('❌ Activo no encontrado.', 'danger')
@@ -371,7 +373,7 @@ def generar_acta_desecho():
     c = conn.cursor()
     c.execute("""
         SELECT id_activo, codigo, nombre, fecha_desecho, usuario_desecha 
-        FROM activos_desechados 
+        FROM desechos 
         WHERE fecha_desecho = ?
     """, (fecha,))
     desechos = c.fetchall()
