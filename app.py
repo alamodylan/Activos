@@ -11,6 +11,7 @@ from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 
 CLAVE_DESECHO = "atm2406"
+CLAVE = "atm2406"
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY", "atm2406")
 # Configuración de la base de datos PostgreSQL
@@ -303,7 +304,7 @@ def exportar_excel():
     )
 @app.route('/desechar/<int:id>', methods=['POST'])
 def desechar_activo(id):
-    clave = request.form.get('clave_desecho')
+    clave = request.form.get('clave')
     usuario_desecha = request.form.get('usuario_desecha')
 
     if clave != CLAVE_DESECHO:
@@ -347,9 +348,9 @@ def ver_desechos():
     conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute("""
-        SELECT id, id_activo, fecha_desecho, usuario_desecha
-        FROM activos_desechados
-        ORDER BY fecha_desecho DESC;
+    SELECT id_activo, codigo, nombre, fecha_desecho, usuario_desecha
+    FROM desechos
+    ORDER BY fecha_desecho DESC;
     """)
     desechados = cursor.fetchall()
     cursor.close()
