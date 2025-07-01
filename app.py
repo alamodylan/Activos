@@ -9,7 +9,7 @@ from io import BytesIO
 import openpyxl
 CLAVE_DESECHO = "atm2406"
 app = Flask(__name__)
-
+app.secret_key = CLAVE_DESECHO
 # Configuración de la base de datos PostgreSQL
 DATABASE_URL = os.environ.get("DATABASE_URL", "postgresql://citasatm_user:SlwK1sFIPJal7m8KaDtlRlYu1NseKxnV@dpg-ctdis2jv2p9s73ai7op0-a.oregon-postgres.render.com/citasatm_db")
 AUTHORIZED_CODE = "atm2406"  # Código de autorización para modificar y eliminar
