@@ -305,16 +305,23 @@ def desechar_activo(id_activo):
 
     if clave_ingresada != CLAVE_DESECHO:
         flash('❌ Clave incorrecta. No se procesó el desecho.', 'danger')
-        return redirect(url_for('ver_activo', id= id_activo))
+        return redirect(url_for('ver_activo', id=id_activo))
 
     conn = get_db_connection()
     cursor = conn.cursor()
 
     try:
+        # Obtener datos antes de eliminar
+        cursor.execute("SELECT codigo, nombre FROM activos WHERE id = %s;", (id_activo,))
+        activo = cursor.fetchone()
+        codigo = activo[0]
+        nombre = activo[1]
+
+        # Insertar en desechados con más detalle
         cursor.execute("""
-            INSERT INTO activos_desechados (id_activo, usuario_desecha)
-            VALUES (%s, %s);
-        """, (id_activo, usuario_desecha))
+            INSERT INTO activos_desechados (id_activo, codigo, nombre, usuario_desecha)
+            VALUES (%s, %s, %s, %s);
+        """, (id_activo, codigo, nombre, usuario_desecha))
 
         cursor.execute("DELETE FROM activos WHERE id = %s;", (id_activo,))
         conn.commit()
@@ -334,9 +341,9 @@ def ver_desechos():
     conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute("""
-        SELECT ad.id, a.codigo, a.nombre, ad.fecha_desecho, ad.usuario_desecha
-        FROM activos_desechados ad
-        JOIN activos a ON ad.id_activo = a.id;
+        SELECT id, id_activo, fecha_desecho, usuario_desecha
+        FROM activos_desechados
+        ORDER BY fecha_desecho DESC;
     """)
     desechados = cursor.fetchall()
     cursor.close()

@@ -99,38 +99,9 @@
     <button class="btn btn-danger mt-3" data-bs-toggle="modal" data-bs-target="#modalDesecharActivo">
     🗑️ Enviar a Desecho
 </button>
-
-<!-- MODAL para confirmar clave y quién desecha -->
-<div class="modal fade" id="modalDesecharActivo" tabindex="-1" aria-labelledby="modalDesecharActivoLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <form method="POST" action="{{ url_for('desechar_activo', id_activo=activo.id) }}">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="modalDesecharActivoLabel">Confirmar envío a desecho</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-        </div>
-        <div class="modal-body">
-          <p>Activo: <strong>{{ activo.nombre }}</strong> (Código: {{ activo.codigo }})</p>
-          
-          <label>🔐 Ingresá la clave de autorización:</label>
-          <input type="password" name="clave" class="form-control mb-3" placeholder="Clave de acceso" required>
-
-          <label>👤 ¿Quién desecha este activo?</label>
-          <select name="usuario_desecha" class="form-control" required>
-              <option value="">Seleccione una opción</option>
-              <option value="Dylan Bustos">Dylan Bustos</option>
-              <option value="Deynor Gonzalez">Deynor Gonzalez</option>
-              <option value="Lester Fuentes">Lester Fuentes</option>
-          </select>
-        </div>
-        <div class="modal-footer">
-          <button type="submit" class="btn btn-danger">Sí, Desechar</button>
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-        </div>
-      </div>
-    </form>
-  </div>
-</div>
+<button class="btn btn-danger mt-3" onclick="iniciarDesecho()">
+    🗑️ Enviar a Desecho
+</button>
 
     <!-- Mostrar el código QR si ya existe -->
     <h2>Código QR</h2>
@@ -140,5 +111,80 @@
     <div class="actions">
         <a href="/" class="back">Volver a la lista</a>
     </div>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+const CLAVE_CORRECTA = "atm2406";  // Podés ocultarla mejor en backend más adelante
+
+function iniciarDesecho() {
+    // Paso 1: Solicitar clave
+    Swal.fire({
+        title: '🔐 Ingresar clave de seguridad',
+        input: 'password',
+        inputPlaceholder: 'Clave de acceso',
+        showCancelButton: true,
+        confirmButtonText: 'Validar',
+        cancelButtonText: 'Cancelar',
+        preConfirm: (clave) => {
+            if (clave !== CLAVE_CORRECTA) {
+                Swal.showValidationMessage('❌ Clave incorrecta');
+                return false;
+            }
+        }
+    }).then((result) => {
+        if (result.isConfirmed) {
+            seleccionarUsuario(); // Si la clave fue válida, pedimos el usuario
+        }
+    });
+}
+
+function seleccionarUsuario() {
+    Swal.fire({
+        title: '👤 ¿Quién está desechando este activo?',
+        input: 'select',
+        inputOptions: {
+            'Dylan Bustos': 'Dylan Bustos',
+            'Deynor Gonzalez': 'Deynor Gonzalez',
+            'Lester Fuentes': 'Lester Fuentes'
+        },
+        inputPlaceholder: 'Seleccioná una persona',
+        showCancelButton: true,
+        confirmButtonText: 'Desechar',
+        cancelButtonText: 'Cancelar',
+        inputValidator: (value) => {
+            if (!value) {
+                return 'Tenés que seleccionar un nombre';
+            }
+        }
+    }).then((result) => {
+        if (result.isConfirmed) {
+            enviarFormulario(result.value);
+        }
+    });
+}
+
+function enviarFormulario(usuario) {
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = "{{ url_for('desechar_activo', id_activo=activo.id) }}";
+
+    // Clave oculta
+    const inputClave = document.createElement('input');
+    inputClave.type = 'hidden';
+    inputClave.name = 'clave';
+    inputClave.value = CLAVE_CORRECTA;
+    form.appendChild(inputClave);
+
+    // Usuario
+    const inputUsuario = document.createElement('input');
+    inputUsuario.type = 'hidden';
+    inputUsuario.name = 'usuario_desecha';
+    inputUsuario.value = usuario;
+    form.appendChild(inputUsuario);
+
+    document.body.appendChild(form);
+    form.submit();
+}
+</script>
 </body>
 </html>
