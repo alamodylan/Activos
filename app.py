@@ -7,6 +7,9 @@ import qrcode
 import pandas as pd
 from io import BytesIO
 import openpyxl
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfgen import canvas
+
 CLAVE_DESECHO = "atm2406"
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY", "atm2406")
@@ -298,44 +301,47 @@ def exportar_excel():
         as_attachment=True,
         download_name="Listado_Activos.xlsx"
     )
-@app.route('/desechar_activo/<int:id_activo>', methods=['POST'])
-def desechar_activo(id_activo):
-    clave_ingresada = request.form.get('clave')
+@app.route('/desechar/<int:id>', methods=['POST'])
+def desechar_activo(id):
+    clave = request.form.get('clave_desecho')
     usuario_desecha = request.form.get('usuario_desecha')
 
-    if clave_ingresada != CLAVE_DESECHO:
-        flash('❌ Clave incorrecta. No se procesó el desecho.', 'danger')
-        return redirect(url_for('ver_activo', id=id_activo))
+    if clave != CLAVE_DESECHO:
+        flash('❌ Clave incorrecta para desechar.', 'danger')
+        return redirect(url_for('index'))
 
     conn = get_db_connection()
-    cursor = conn.cursor()
+    cur = conn.cursor()
 
     try:
-        # Obtener datos antes de eliminar
-        cursor.execute("SELECT codigo, nombre FROM activos WHERE id = %s;", (id_activo,))
-        activo = cursor.fetchone()
-        codigo = activo[0]
-        nombre = activo[1]
+        # Buscar activo por ID
+        cur.execute("SELECT id, codigo, nombre FROM activos WHERE id = %s", (id,))
+        activo = cur.fetchone()
 
-        # Insertar en desechados con más detalle
-        cursor.execute("""
-            INSERT INTO activos_desechados (id_activo, codigo, nombre, usuario_desecha)
-            VALUES (%s, %s, %s, %s);
-        """, (id_activo, codigo, nombre, usuario_desecha))
+        if activo:
+            # Insertar en tabla de desechos
+            cur.execute("""
+                INSERT INTO desechos (id_activo, codigo, nombre, fecha_desecho, usuario_desecha)
+                VALUES (%s, %s, %s, NOW(), %s)
+            """, (activo[0], activo[1], activo[2], usuario_desecha))
 
-        cursor.execute("DELETE FROM activos WHERE id = %s;", (id_activo,))
-        conn.commit()
-        flash('✅ Activo enviado a desecho correctamente.', 'success')
+            # Eliminar de activos
+            cur.execute("DELETE FROM activos WHERE id = %s", (id,))
+            conn.commit()
+
+            flash('✅ Activo desechado correctamente.', 'success')
+        else:
+            flash('❌ Activo no encontrado.', 'danger')
 
     except Exception as e:
         conn.rollback()
-        flash(f'Error al desechar: {e}', 'danger')
+        flash(f'⚠️ Error al desechar: {e}', 'danger')
 
     finally:
-        cursor.close()
+        cur.close()
         conn.close()
 
-    return redirect(url_for('ver_desechos'))
+    return redirect(url_for('index'))
 @app.route('/ver_desechos')
 def ver_desechos():
     conn = get_db_connection()
@@ -350,6 +356,62 @@ def ver_desechos():
     conn.close()
     return render_template('desechos.html', desechados=desechados)
 
+@app.route('/acta_desecho/<fecha>')
+def generar_acta_desecho(fecha):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT codigo, nombre, usuario_desecha
+        FROM activos_desechados
+        WHERE TO_CHAR(fecha_desecho, 'YYYY-MM-DD') = %s
+    """, (fecha,))
+    activos = cursor.fetchall()
+
+    cursor.close()
+    conn.close()
+
+    if not activos:
+        flash("No hay desechos para esta fecha.", "warning")
+        return redirect(url_for('ver_desechos'))
+
+    path_pdf = f"acta_desecho_{fecha}.pdf"
+    c = canvas.Canvas(path_pdf, pagesize=letter)
+    width, height = letter
+
+    # ✅ Ruta al logo
+    logo_path = os.path.join('static', 'LogoAlamo.png')
+    if os.path.exists(logo_path):
+        c.drawImage(logo_path, 40, height - 80, width=150, preserveAspectRatio=True, mask='auto')
+    else:
+        c.drawString(40, height - 50, "⚠ Logo no encontrado")
+
+    # 📝 Título
+    c.setFont("Helvetica-Bold", 16)
+    c.drawCentredString(width / 2, height - 100, f"Acta de Desecho de Activos - {fecha}")
+
+    # 🧾 Lista de activos
+    c.setFont("Helvetica", 10)
+    y = height - 140
+    for activo in activos:
+        texto = f"Código: {activo[0]}  |  Nombre: {activo[1]}  |  Desechado por: {activo[2]}"
+        c.drawString(40, y, texto)
+        y -= 15
+        if y < 80:
+            c.showPage()
+            y = height - 50
+
+    # ✍️ Firmas
+    y -= 40
+    c.drawString(40, y, "______________________________")
+    c.drawString(40, y - 15, "Firma de quien desecha")
+
+    c.drawString(300, y, "______________________________")
+    c.drawString(300, y - 15, "Firma de quien inspecciona")
+
+    c.save()
+
+    return send_file(path_pdf, as_attachment=True)
 crear_tablas()  # Activos
 crear_tabla_desechos()  # Desechados
 crear_tabla_bitacora_entregas()  # Bitácora de entregas

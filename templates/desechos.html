@@ -79,6 +79,13 @@ $(document).ready(function() {
     });
 });
 </script>
+<form method="POST" action="{{ url_for('generar_acta_desecho') }}" class="mb-4">
+    <label for="fecha" class="form-label">📅 Seleccione una fecha:</label>
+    <input type="date" id="fecha" name="fecha" required class="form-control" style="max-width: 300px;">
+    {% if desechados|length > 0 %}
+    <button type="submit" class="btn btn-secondary mt-2">📄 Generar acta de desecho</button>
+    {% endif %}
+</form>
 
 </body>
 </html>
