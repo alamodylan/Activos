@@ -164,7 +164,7 @@ function seleccionarUsuario() {
 function enviarFormulario(usuario) {
     const form = document.createElement('form');
     form.method = 'POST';
-    form.action = "{{ url_for('desechar_activo', id=activo.id) }}";
+    form.action = "{{ url_for('desechar_activo', id=activo['id']) }}";;
 
     // Clave oculta
     const inputClave = document.createElement('input');
