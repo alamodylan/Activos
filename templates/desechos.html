@@ -1,6 +1,12 @@
-{% extends "layout.html" %}
-{% block content %}
-
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Activos Desechados</title>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.3.6/css/buttons.dataTables.min.css">
+</head>
+<body class="container">
 <h2 class="mt-4 mb-3">📦 Activos Desechados</h2>
 
 <table id="tabla_desechos" class="display nowrap table table-bordered table-striped" style="width:100%">
@@ -74,4 +80,5 @@ $(document).ready(function() {
 });
 </script>
 
-{% endblock %}
+</body>
+</html>
