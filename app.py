@@ -356,62 +356,74 @@ def ver_desechos():
     conn.close()
     return render_template('desechos.html', desechados=desechados)
 
-@app.route('/acta_desecho/<fecha>')
-def generar_acta_desecho(fecha):
-    conn = get_db_connection()
-    cursor = conn.cursor()
+@app.route('/generar_acta_desecho', methods=['POST'])
+def generar_acta_desecho():
+    fecha = request.form.get('fecha')
 
-    cursor.execute("""
-        SELECT codigo, nombre, usuario_desecha
-        FROM activos_desechados
-        WHERE TO_CHAR(fecha_desecho, 'YYYY-MM-DD') = %s
+    # Buscar los activos desechados en esa fecha
+    conn = get_db_connection()  # cambia por tu DB si es necesario
+    c = conn.cursor()
+    c.execute("""
+        SELECT id_activo, codigo, nombre, fecha_desecho, usuario_desecha 
+        FROM activos_desechados 
+        WHERE fecha_desecho = ?
     """, (fecha,))
-    activos = cursor.fetchall()
-
-    cursor.close()
+    desechos = c.fetchall()
     conn.close()
 
-    if not activos:
-        flash("No hay desechos para esta fecha.", "warning")
+    if not desechos:
+        flash("⚠️ No hay activos desechados en esa fecha.", "warning")
         return redirect(url_for('ver_desechos'))
 
-    path_pdf = f"acta_desecho_{fecha}.pdf"
-    c = canvas.Canvas(path_pdf, pagesize=letter)
+    # Crear PDF
+    buffer = BytesIO()
+    c = canvas.Canvas(buffer, pagesize=letter)
     width, height = letter
 
-    # ✅ Ruta al logo
-    logo_path = os.path.join('static', 'LogoAlamo.png')
+    # Agregar logo
+    logo_path = os.path.join(app.root_path, 'static', 'LogoAlamo', 'logo.png')
     if os.path.exists(logo_path):
-        c.drawImage(logo_path, 40, height - 80, width=150, preserveAspectRatio=True, mask='auto')
-    else:
-        c.drawString(40, height - 50, "⚠ Logo no encontrado")
+        c.drawImage(logo_path, 40, height - 80, width=120, preserveAspectRatio=True, mask='auto')
 
-    # 📝 Título
-    c.setFont("Helvetica-Bold", 16)
-    c.drawCentredString(width / 2, height - 100, f"Acta de Desecho de Activos - {fecha}")
-
-    # 🧾 Lista de activos
+    # Título y fecha
+    c.setFont("Helvetica-Bold", 14)
+    c.drawString(200, height - 50, "ACTA DE DESECHO DE ACTIVOS")
     c.setFont("Helvetica", 10)
+    c.drawString(40, height - 100, f"Fecha del desecho: {fecha}")
+
+    # Encabezados tabla
     y = height - 140
-    for activo in activos:
-        texto = f"Código: {activo[0]}  |  Nombre: {activo[1]}  |  Desechado por: {activo[2]}"
-        c.drawString(40, y, texto)
-        y -= 15
-        if y < 80:
+    c.setFont("Helvetica-Bold", 10)
+    c.drawString(40, y, "Código")
+    c.drawString(150, y, "Nombre")
+    c.drawString(400, y, "Desechado por")
+
+    # Cuerpo tabla
+    c.setFont("Helvetica", 10)
+    y -= 20
+    for item in desechos:
+        if y < 100:
             c.showPage()
-            y = height - 50
+            y = height - 100
+        c.drawString(40, y, str(item[1]))  # Código
+        c.drawString(150, y, str(item[2]))  # Nombre
+        c.drawString(400, y, str(item[4]))  # Usuario
+        y -= 20
 
-    # ✍️ Firmas
+    # Firmas
     y -= 40
-    c.drawString(40, y, "______________________________")
+    c.drawString(40, y, "____________________________")
+    c.drawString(300, y, "____________________________")
     c.drawString(40, y - 15, "Firma de quien desecha")
-
-    c.drawString(300, y, "______________________________")
-    c.drawString(300, y - 15, "Firma de quien inspecciona")
+    c.drawString(300, y - 15, "Firma del inspector")
 
     c.save()
+    buffer.seek(0)
 
-    return send_file(path_pdf, as_attachment=True)
+    return send_file(buffer, as_attachment=True,
+                     download_name=f"acta_desecho_{fecha}.pdf",
+                     mimetype='application/pdf')
+
 crear_tablas()  # Activos
 crear_tabla_desechos()  # Desechados
 crear_tabla_bitacora_entregas()  # Bitácora de entregas

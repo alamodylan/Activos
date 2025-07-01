@@ -3,89 +3,106 @@
 <head>
     <meta charset="UTF-8">
     <title>Activos Desechados</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- DataTables CSS -->
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.3.6/css/buttons.dataTables.min.css">
 </head>
-<body class="container">
-<h2 class="mt-4 mb-3">📦 Activos Desechados</h2>
+<body class="container mt-4">
 
-<table id="tabla_desechos" class="display nowrap table table-bordered table-striped" style="width:100%">
-    <thead class="table-dark">
-        <tr>
-            <th>ID Activo</th>
-            <th>Código</th>
-            <th>Nombre</th>
-            <th>Fecha de Desecho</th>
-            <th>Desechado por</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for item in desechados %}
-        <tr>
-            <td>{{ item[0] }}</td> <!-- id_activo -->
-            <td>{{ item[1] }}</td> <!-- código -->
-            <td>{{ item[2] }}</td> <!-- nombre -->
-            <td>{{ item[3] }}</td> <!-- fecha_desecho -->
-            <td>{{ item[4] }}</td> <!-- usuario_desecha -->
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+    <h2 class="mb-4">📦 Activos Desechados</h2>
 
-<a href="{{ url_for('index') }}" class="btn btn-primary mt-4">⬅ Volver al inicio</a>
+    <table id="tabla_desechos" class="display nowrap table table-bordered table-striped" style="width:100%">
+        <thead class="table-dark">
+            <tr>
+                <th>ID Activo</th>
+                <th>Código</th>
+                <th>Nombre</th>
+                <th>Fecha de Desecho</th>
+                <th>Desechado por</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in desechados %}
+            <tr>
+                <td>{{ item[0] }}</td>
+                <td>{{ item[1] }}</td>
+                <td>{{ item[2] }}</td>
+                <td>{{ item[3] }}</td>
+                <td>{{ item[4] }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 
-<!-- jQuery y DataTables + Export -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
-<script src="https://cdn.datatables.net/buttons/2.3.6/js/dataTables.buttons.min.js"></script>
-<script src="https://cdn.datatables.net/buttons/2.3.6/js/buttons.html5.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <!-- Botón volver -->
+    <div class="mt-4">
+        <a href="{{ url_for('index') }}" class="btn btn-primary">⬅ Volver al inicio</a>
+    </div>
 
-<!-- DataTables CSS -->
-<link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
-<link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.3.6/css/buttons.dataTables.min.css">
+    <!-- Formulario para generar acta -->
+    <hr class="my-4">
+    <h4>📄 Generar acta de desecho por fecha</h4>
+    <form method="POST" action="{{ url_for('generar_acta_desecho') }}" class="row g-3 align-items-center">
+        <div class="col-auto">
+            <label for="fecha" class="col-form-label">📅 Seleccione una fecha:</label>
+        </div>
+        <div class="col-auto">
+            <input type="date" id="fecha" name="fecha" required class="form-control">
+        </div>
+        <div class="col-auto">
+            {% if desechados|length > 0 %}
+            <button type="submit" class="btn btn-success">📄 Generar PDF</button>
+            {% else %}
+            <span class="text-muted">No hay activos para generar acta.</span>
+            {% endif %}
+        </div>
+    </form>
 
-<!-- Inicialización DataTable -->
-<script>
-$(document).ready(function() {
-    $('#tabla_desechos').DataTable({
-        dom: 'Bfrtip',
-        buttons: [
-            {
-                extend: 'excelHtml5',
-                text: '📥 Exportar a Excel',
-                title: 'Activos Desechados'
-            },
-            {
-                extend: 'csvHtml5',
-                text: '📥 Exportar a CSV',
-                title: 'Activos Desechados'
+    <!-- jQuery y DataTables JS -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.3.6/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.3.6/js/buttons.html5.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+
+    <!-- Inicialización DataTable -->
+    <script>
+    $(document).ready(function() {
+        $('#tabla_desechos').DataTable({
+            dom: 'Bfrtip',
+            buttons: [
+                {
+                    extend: 'excelHtml5',
+                    text: '📥 Exportar a Excel',
+                    title: 'Activos Desechados'
+                },
+                {
+                    extend: 'csvHtml5',
+                    text: '📥 Exportar a CSV',
+                    title: 'Activos Desechados'
+                }
+            ],
+            pageLength: 10,
+            responsive: true,
+            language: {
+                search: "🔍 Buscar:",
+                lengthMenu: "Mostrar _MENU_ registros",
+                zeroRecords: "No se encontraron activos desechados",
+                info: "Mostrando _START_ a _END_ de _TOTAL_ registros",
+                infoEmpty: "No hay registros disponibles",
+                infoFiltered: "(filtrado de _MAX_ registros totales)",
+                paginate: {
+                    next: "Siguiente",
+                    previous: "Anterior"
+                }
             }
-        ],
-        pageLength: 10,
-        responsive: true,
-        language: {
-            search: "🔍 Buscar:",
-            lengthMenu: "Mostrar _MENU_ registros",
-            zeroRecords: "No se encontraron activos desechados",
-            info: "Mostrando _START_ a _END_ de _TOTAL_ registros",
-            infoEmpty: "No hay registros disponibles",
-            infoFiltered: "(filtrado de _MAX_ registros totales)",
-            paginate: {
-                next: "Siguiente",
-                previous: "Anterior"
-            }
-        }
+        });
     });
-});
-</script>
-<form method="POST" action="{{ url_for('generar_acta_desecho') }}" class="mb-4">
-    <label for="fecha" class="form-label">📅 Seleccione una fecha:</label>
-    <input type="date" id="fecha" name="fecha" required class="form-control" style="max-width: 300px;">
-    {% if desechados|length > 0 %}
-    <button type="submit" class="btn btn-secondary mt-2">📄 Generar acta de desecho</button>
-    {% endif %}
-</form>
+    </script>
 
 </body>
 </html>
