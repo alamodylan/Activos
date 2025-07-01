@@ -304,7 +304,7 @@ def exportar_excel():
     )
 @app.route('/desechar/<int:id>', methods=['POST'])
 def desechar_activo(id):
-    clave = request.form.get('clave')
+    clave = request.form.get('clave')  # Debe coincidir con el input name en el HTML
     usuario_desecha = request.form.get('usuario_desecha')
 
     if clave != CLAVE_DESECHO:
@@ -320,6 +320,8 @@ def desechar_activo(id):
         activo = cur.fetchone()
 
         if activo:
+            print(f"✅ Desechando activo: {activo[1]}, ID: {activo[0]}, por: {usuario_desecha}")
+
             # Insertar en tabla de desechos
             cur.execute("""
                 INSERT INTO desechos (id_activo, codigo, nombre, fecha_desecho, usuario_desecha)
@@ -328,14 +330,16 @@ def desechar_activo(id):
 
             # Eliminar de activos
             cur.execute("DELETE FROM activos WHERE id = %s", (id,))
+            print(f"🗑️ Eliminado activo con ID: {id} de la tabla activos")
+            
             conn.commit()
-
             flash('✅ Activo desechado correctamente.', 'success')
         else:
             flash('❌ Activo no encontrado.', 'danger')
 
     except Exception as e:
         conn.rollback()
+        print(f"⚠️ Error al desechar: {e}")
         flash(f'⚠️ Error al desechar: {e}', 'danger')
 
     finally:
@@ -343,6 +347,7 @@ def desechar_activo(id):
         conn.close()
 
     return redirect(url_for('index'))
+
 @app.route('/ver_desechos')
 def ver_desechos():
     conn = get_db_connection()
