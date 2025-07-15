@@ -304,7 +304,7 @@ def exportar_excel():
     )
 @app.route('/desechar/<int:id>', methods=['POST'])
 def desechar_activo(id):
-    clave = request.form.get('clave')  # Debe coincidir con el input name en el HTML
+    clave = request.form.get('clave')
     usuario_desecha = request.form.get('usuario_desecha')
 
     if clave != CLAVE_DESECHO:
@@ -315,24 +315,30 @@ def desechar_activo(id):
     cur = conn.cursor()
 
     try:
-        # Buscar activo por ID
-        cur.execute("SELECT id, codigo, nombre FROM activos WHERE id = %s", (id,))
+        # Traer todos los campos que vamos a necesitar para insertarlos en la tabla de desechos
+        cur.execute("""
+            SELECT id, codigo, nombre, ubicacion, predio, marca, serie 
+            FROM activos 
+            WHERE id = %s
+        """, (id,))
         activo = cur.fetchone()
 
         if activo:
-            print(f"✅ Desechando activo: {activo[1]}, ID: {activo[0]}, por: {usuario_desecha}")
+            print(f"✅ Desechando activo: {activo[1]}")
 
-            # Insertar en tabla de desechos
+            # Insertar todos los datos en desechos
             cur.execute("""
-                INSERT INTO desechos (id_activo, codigo, nombre, fecha_desecho, usuario_desecha)
-                VALUES (%s, %s, %s, NOW(), %s)
-            """, (activo[0], activo[1], activo[2], usuario_desecha))
+                INSERT INTO desechos (
+                    id_activo, codigo, nombre, ubicacion, predio, marca, serie,
+                    fecha_desecho, usuario_desecha
+                ) VALUES (%s, %s, %s, %s, %s, %s, %s, NOW(), %s)
+            """, (
+                activo[0], activo[1], activo[2], activo[3], activo[4],
+                activo[5], activo[6], usuario_desecha
+            ))
 
             # Eliminar de activos
             cur.execute("DELETE FROM activos WHERE id = %s", (id,))
-            print(f"🗑️ Eliminado activo con ID: {id} de la tabla activos")
-
-            print("🔥 Ejecutando commit del desecho...")
             conn.commit()
 
             flash('✅ Activo desechado correctamente.', 'success')
@@ -341,9 +347,7 @@ def desechar_activo(id):
 
     except Exception as e:
         conn.rollback()
-        print(f"⚠️ Error al desechar: {e}")
-        flash(f'⚠️ Error al desechar: {e}', 'danger')
-
+        flash(f"⚠️ Error al desechar: {e}", "danger")
     finally:
         cur.close()
         conn.close()
