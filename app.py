@@ -372,9 +372,9 @@ def generar_acta_desecho():
     conn = get_db_connection()  # cambia por tu DB si es necesario
     c = conn.cursor()
     c.execute("""
-        SELECT id_activo, codigo, nombre, fecha_desecho, usuario_desecha 
-        FROM desechos 
-        WHERE fecha_desecho = ?
+        SELECT id_activo, codigo, nombre, fecha_desecho, usuario_desecha
+        FROM desechos
+        WHERE fecha_desecho = %s
     """, (fecha,))
     desechos = c.fetchall()
     conn.close()
