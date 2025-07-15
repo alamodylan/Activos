@@ -62,7 +62,7 @@ def crear_tabla_desechos():
     cursor = conn.cursor()
 
     cursor.execute("""
-        CREATE TABLE IF NOT EXISTS activos_desechados (
+        CREATE TABLE IF NOT EXISTS desechos (
             id SERIAL PRIMARY KEY,
             id_activo INTEGER REFERENCES activos(id),
             fecha_desecho TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -355,11 +355,11 @@ def ver_desechos():
     conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute("""
-    SELECT id_activo, codigo, nombre, fecha_desecho, usuario_desecha
-    FROM desechos
-    ORDER BY fecha_desecho DESC;
+        SELECT codigo, nombre, ubicacion, predio, marca, serie, usuario_desecha, fecha_desecho
+        FROM desechos
+        ORDER BY fecha_desecho DESC;
     """)
-    desechados = cursor.fetchall()
+    desechados = [dict(zip([desc[0] for desc in cursor.description], row)) for row in cursor.fetchall()]
     cursor.close()
     conn.close()
     return render_template('desechos.html', desechados=desechados)

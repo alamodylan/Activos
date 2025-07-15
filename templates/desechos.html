@@ -18,21 +18,27 @@
     <table id="tabla_desechos" class="display nowrap table table-bordered table-striped" style="width:100%">
         <thead class="table-dark">
             <tr>
-                <th>ID Activo</th>
-                <th>Código</th>
+                <th>Número de Activo</th>
                 <th>Nombre</th>
-                <th>Fecha de Desecho</th>
+                <th>Ubicación</th>
+                <th>Predio</th>
+                <th>Marca</th>
+                <th>Serie</th>
                 <th>Desechado por</th>
+                <th>Fecha de Desecho</th>
             </tr>
         </thead>
         <tbody>
             {% for item in desechados %}
             <tr>
-                <td>{{ item[0] }}</td>
-                <td>{{ item[1] }}</td>
-                <td>{{ item[2] }}</td>
-                <td>{{ item[3] }}</td>
-                <td>{{ item[4] }}</td>
+                <td>{{ item["codigo"] }}</td>
+                <td>{{ item["nombre"] }}</td>
+                <td>{{ item["ubicacion"] }}</td>
+                <td>{{ item["predio"] }}</td>
+                <td>{{ item["marca"] }}</td>
+                <td>{{ item["serie"] }}</td>
+                <td>{{ item["usuario_desecha"] }}</td>
+                <td>{{ item["fecha_desecho"] }}</td>
             </tr>
             {% endfor %}
         </tbody>
