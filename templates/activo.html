@@ -166,6 +166,14 @@ function seleccionarUsuario() {
 }
 
 function enviarFormulario(usuario) {
+    const inputUsuario = document.getElementById("usuario_desecha_input");
+    inputUsuario.value = usuario;
+
+    const formulario = document.getElementById("form-desechar");
+    formulario.submit();
+}
+
+function enviarFormulario(usuario) {
     const form = document.createElement('form');
     form.method = 'POST';
     form.action = "{{ url_for('desechar_activo', id=activo['id']) }}";;
