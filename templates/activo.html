@@ -172,29 +172,6 @@ function enviarFormulario(usuario) {
     const formulario = document.getElementById("form-desechar");
     formulario.submit();
 }
-
-function enviarFormulario(usuario) {
-    const form = document.createElement('form');
-    form.method = 'POST';
-    form.action = "{{ url_for('desechar_activo', id=activo['id']) }}";;
-
-    // Clave oculta
-    const inputClave = document.createElement('input');
-    inputClave.type = 'hidden';
-    inputClave.name = 'clave';
-    inputClave.value = CLAVE_CORRECTA;
-    form.appendChild(inputClave);
-
-    // Usuario
-    const inputUsuario = document.createElement('input');
-    inputUsuario.type = 'hidden';
-    inputUsuario.name = 'usuario_desecha';
-    inputUsuario.value = usuario;
-    form.appendChild(inputUsuario);
-
-    document.body.appendChild(form);
-    form.submit();
-}
 </script>
 </body>
 </html>
