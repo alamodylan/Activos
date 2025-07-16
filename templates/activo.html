@@ -101,6 +101,10 @@
     🗑️ Enviar a Desecho
 </button>
 
+<form id="form-desechar" method="POST" action="{{ url_for('desechar_activo', id=activo.id) }}" style="display: none;">
+    <input type="hidden" name="clave" value="atm2406">
+    <input type="hidden" name="usuario_desecha" id="usuario_desecha_input">
+</form>
     <!-- Mostrar el código QR si ya existe -->
     <h2>Código QR</h2>
 <img src="{{ url_for('static', filename='QR-Codes/' + activo['codigo'] + '.png') }}" alt="Código QR del activo">
