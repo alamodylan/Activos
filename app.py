@@ -304,6 +304,7 @@ def exportar_excel():
     )
 @app.route('/desechar/<int:id>', methods=['POST'])
 def desechar_activo(id):
+    print(f"📩 Se recibió solicitud para desechar activo ID: {id}")
     clave = request.form.get('clave')
     usuario_desecha = request.form.get('usuario_desecha')
 
