@@ -193,7 +193,6 @@
     </h1>
     <h2 style="text-align: center;">Lista de Activos</h2>
 
-    <!-- Barra de búsqueda y filtros -->
     <div class="search-filter">
         <form method="GET" action="/" style="display: flex; flex: 1; gap: 10px;">
             <input type="text" name="search" placeholder="Buscar por nombre, ubicación, predio..." value="{{ search_query }}">
@@ -207,36 +206,26 @@
         </form>
     </div>
 
-  
-<div style="display: flex; justify-content: space-between; width: 90%; margin: 0 auto 10px auto;">
-  
-  <!-- Exportar a Excel (más centrado hacia el inicio de la tabla) -->
-  <div style="flex: 0 0 auto;">
-    <a href="/exportar_excel" class="export-link">
-      <img src="{{ url_for('static', filename='LogoExcel.png') }}" alt="Excel" class="icon">
-      Exportar a Excel
-    </a>
-  </div>
+    <div style="display: flex; justify-content: space-between; width: 90%; margin: 0 auto 10px auto;">
+        <div style="flex: 0 0 auto;">
+            <a href="/exportar_excel" class="export-link">
+                <img src="{{ url_for('static', filename='LogoExcel.png') }}" alt="Excel" class="icon">
+                Exportar a Excel
+            </a>
+        </div>
+        <div style="flex-grow: 1;"></div>
+        <div class="d-flex justify-content-between mb-3">
+            <a href="{{ url_for('ver_desechos') }}" class="btn btn-danger">🗑 Ver activos desechados</a>
+            <div style="flex: 0 0 auto;">
+                <form method="GET" action="/registrar" onsubmit="return confirmarCodigo();" style="display:inline;">
+                    <button type="submit" class="export-link new-asset" style="background-color: #06a5a5;">
+                        Registrar Nuevo Activo
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
 
-  <!-- Espaciador para mantener centrado el medio -->
-  <div style="flex-grow: 1;"></div>
-
- <div class="d-flex justify-content-between mb-3">
-    <a href="{{ url_for('ver_desechos') }}" class="btn btn-danger">
-        🗑 Ver activos desechados
-    </a>
-
-  <!-- Registrar Nuevo Activo (más centrado hacia la última columna) -->
-  <div style="flex: 0 0 auto;">
-    <form method="GET" action="/registrar" onsubmit="return confirmarCodigo();" style="display:inline;">
-      <button type="submit" class="export-link new-asset" style="background-color: #06a5a5;">
-        Registrar Nuevo Activo
-      </button>
-    </form>
-  </div>
-</div>
-
-    <!-- Tabla de activos -->
     <div class="table-container">
         <table>
             <thead>
@@ -270,6 +259,15 @@
                             <input type="hidden" name="codigo_confirmacion" value="">
                             <button type="submit" class="delete">Eliminar</button>
                         </form>
+
+                        <!-- Botón Desechar -->
+                        <button class="delete" style="background-color: #6c757d;" onclick="iniciarDesecho('{{ activo.id }}')">🗑 Desechar</button>
+
+                        <!-- Formulario oculto de Desecho -->
+                        <form id="form-desechar-{{ activo['id'] }}" method="POST" action="{{ url_for('desechar_activo', id=activo['id']) }}" style="display:none;">
+                            <input type="hidden" name="clave" value="atm2406">
+                            <input type="hidden" name="usuario_desecha" id="usuario_desecha_input_{{ activo['id'] }}">
+                        </form>
                     </td>
                 </tr>
                 {% endfor %}
@@ -282,32 +280,89 @@
         </table>
     </div>
 
-    <!-- Enlace para registrar un nuevo activo -->
-<script>
-function confirmarEliminacion(form) {
-    const codigo = prompt("Ingrese el código de autorización para eliminar:");
-    if (codigo === null) return false;  // Cancelado
+    <script>
+        function confirmarEliminacion(form) {
+            const codigo = prompt("Ingrese el código de autorización para eliminar:");
+            if (codigo === null) return false;
+            if (codigo !== "atm2406") {
+                alert("Código incorrecto. No se puede eliminar.");
+                return false;
+            }
+            form.querySelector('input[name="codigo_confirmacion"]').value = codigo;
+            return true;
+        }
 
-    if (codigo !== "atm2406") {
-        alert("Código incorrecto. No se puede eliminar.");
-        return false;
-    }
+        function confirmarCodigo() {
+            const codigo = prompt("Ingrese el código de autorización:");
+            if (codigo === null) return false;
+            if (codigo !== "atm2406") {
+                alert("Código incorrecto.");
+                return false;
+            }
+            return true;
+        }
+    </script>
 
-    // Insertamos el código correcto en el input oculto
-    form.querySelector('input[name="codigo_confirmacion"]').value = codigo;
-    return true;
-}
-</script>
-<script>
-function confirmarCodigo() {
-    const codigo = prompt("Ingrese el código de autorización:");
-    if (codigo === null) return false; // Cancelado
-    if (codigo !== "atm2406") {
-        alert("Código incorrecto.");
-        return false;
-    }
-    return true;
-}
-</script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        const CLAVE_CORRECTA = "atm2406";
+
+        function iniciarDesecho(id) {
+            Swal.fire({
+                title: '🔐 Clave de seguridad',
+                input: 'password',
+                inputLabel: 'Ingresá la clave',
+                inputPlaceholder: 'Clave requerida',
+                inputAttributes: {
+                    maxlength: 20,
+                    autocapitalize: 'off',
+                    autocorrect: 'off'
+                },
+                showCancelButton: true,
+                confirmButtonText: 'Validar',
+                cancelButtonText: 'Cancelar',
+                preConfirm: (clave) => {
+                    if (clave !== CLAVE_CORRECTA) {
+                        Swal.showValidationMessage('❌ Clave incorrecta');
+                        return false;
+                    }
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    seleccionarUsuario(id);
+                }
+            });
+        }
+
+        function seleccionarUsuario(id) {
+            Swal.fire({
+                title: '👤 ¿Quién está desechando este activo?',
+                input: 'select',
+                inputOptions: {
+                    'Dylan Bustos': 'Dylan Bustos',
+                    'Deynor Gonzalez': 'Deynor Gonzalez',
+                    'Lester Fuentes': 'Lester Fuentes'
+                },
+                inputPlaceholder: 'Seleccioná una persona',
+                showCancelButton: true,
+                confirmButtonText: 'Desechar',
+                cancelButtonText: 'Cancelar',
+                inputValidator: (value) => {
+                    if (!value) return '⚠️ Debés seleccionar un nombre';
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    enviarFormularioDesecho(id, result.value);
+                }
+            });
+        }
+
+        function enviarFormularioDesecho(id, usuario) {
+            const inputUsuario = document.getElementById("usuario_desecha_input_" + id);
+            inputUsuario.value = usuario;
+            const form = document.getElementById("form-desechar-" + id);
+            form.submit();
+        }
+    </script>
 </body>
 </html>
