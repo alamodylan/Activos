@@ -264,7 +264,7 @@
                         <button class="delete" style="background-color: #6c757d;" onclick="iniciarDesecho('{{ activo.id }}')">🗑 Desechar</button>
 
                         <!-- Formulario oculto de Desecho -->
-                        <form id="form-desechar-{{ activo['id'] }}" method="POST" action="{{ url_for('desechar_activo', id=activo['id']) }}" style="display:none;">
+                        <form id="form-desechar-{{ activo['id'] }}" method="POST" action="{{ url_for('desechar', id=activo['id']) }}" style="display:none;">
                             <input type="hidden" name="clave" value="atm2406">
                             <input type="hidden" name="usuario_desecha" id="usuario_desecha_input_{{ activo['id'] }}">
                         </form>
